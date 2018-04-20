@@ -1,0 +1,12 @@
+\subsubsection usage Usage
+\verbatim
+<node name="path_smoothing_node" pkg="path_smoothing" type="path_smoothing_node">
+  <param name="is_consider_boundary" type="bool" value="True" />
+  <param name="is_save_map" type="bool" value="False" />
+  <param name="use_self_solver" type="bool" value="False" />
+  <param name="w1" type="double" value="10.0" />
+  <param name="w2" type="double" value="5.0" />
+  <param name="w3" type="double" value="10.0" />
+</node>
+\endverbatim
+

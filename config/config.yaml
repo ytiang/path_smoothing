@@ -1,0 +1,6 @@
+is_consider_boundary: true
+is_save_map: false
+use_self_solver: false
+w1: 10.0
+w2: 5.0
+w3: 10.0
