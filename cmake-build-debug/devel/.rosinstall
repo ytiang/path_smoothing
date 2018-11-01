@@ -1,2 +1,0 @@
-- setup-file:
-    local-name: /home/yangt/catkin_ws/src/path_smoothing/cmake-build-debug/devel/setup.sh

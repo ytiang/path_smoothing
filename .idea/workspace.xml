@@ -2,107 +2,107 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
     <generated>
-      <config projectName="path_smoothing" targetName="gtest_main" />
-      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="tf_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="gmock" />
       <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="roscpp_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="roscpp_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="gtest" />
+      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="path_smoothing_node" />
       <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="run_tests" />
+      <config projectName="path_smoothing" targetName="tf_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="gtest_main" />
+      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="actionlib_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="roscpp_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="rosparam_handler_gencfg" />
+      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="gmock_main" />
+      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="actionlib_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="path_smoothing_gencfg" />
+      <config projectName="path_smoothing" targetName="download_extra_data" />
+      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="dynamic_reconfigure_gencfg" />
+      <config projectName="path_smoothing" targetName="actionlib_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="path_smoothing_genparam" />
+      <config projectName="path_smoothing" targetName="doxygen" />
+      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="tf_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="_catkin_empty_exported_target" />
+      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="tf_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="actionlib_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="tf_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="roscpp_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="roscpp_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="clean_test_results" />
+      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_nodejs" />
+      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_cpp" />
       <config projectName="path_smoothing" targetName="actionlib_generate_messages_nodejs" />
       <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="roscpp_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="actionlib_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="clean_test_results" />
-      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="roscpp_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="actionlib_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="tf_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="gtest" />
-      <config projectName="path_smoothing" targetName="gmock_main" />
-      <config projectName="path_smoothing" targetName="_catkin_empty_exported_target" />
-      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="tf_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="dynamic_reconfigure_gencfg" />
-      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="std_srvs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="path_smoothing_node" />
-      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="rosparam_handler_gencfg" />
-      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="tf_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="path_smoothing_gencfg" />
-      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="tests" />
-      <config projectName="path_smoothing" targetName="run_tests" />
-      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="actionlib_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="path_smoothing_genparam" />
-      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_cpp" />
       <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="grid_map_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="rosgraph_msgs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="gmock" />
-      <config projectName="path_smoothing" targetName="roscpp_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="tf_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="tf_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="doxygen" />
-      <config projectName="path_smoothing" targetName="sensor_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="std_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_lisp" />
-      <config projectName="path_smoothing" targetName="roscpp_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="lanelet_map_msgs_generate_messages_nodejs" />
       <config projectName="path_smoothing" targetName="path_smoothing" />
-      <config projectName="path_smoothing" targetName="actionlib_generate_messages_cpp" />
-      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="tests" />
       <config projectName="path_smoothing" targetName="std_srvs_generate_messages_nodejs" />
-      <config projectName="path_smoothing" targetName="download_extra_data" />
+      <config projectName="path_smoothing" targetName="geometry_msgs_generate_messages_lisp" />
+      <config projectName="path_smoothing" targetName="anm_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="roscpp_generate_messages_eus" />
+      <config projectName="path_smoothing" targetName="tf2_msgs_generate_messages_cpp" />
+      <config projectName="path_smoothing" targetName="nav_msgs_generate_messages_eus" />
       <config projectName="path_smoothing" targetName="rosparam_handler_genparam" />
-      <config projectName="path_smoothing" targetName="visualization_msgs_generate_messages_eus" />
-      <config projectName="path_smoothing" targetName="dynamic_reconfigure_generate_messages_py" />
-      <config projectName="path_smoothing" targetName="actionlib_msgs_generate_messages_py" />
+      <config projectName="path_smoothing" targetName="topic_tools_generate_messages_lisp" />
       <config projectName="path_smoothing" targetName="topic_tools_generate_messages_eus" />
     </generated>
   </component>
@@ -113,11 +113,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2b7c07e9-1bd6-475e-8fa6-da165be0b835" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/launch/path_smoothing.launch" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/drivable_region_node.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.xml" afterPath="$PROJECT_DIR$/package.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/path_smoothing.dir/src/cg_solver.cpp.o" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/path_smoothing.dir/src/cg_solver.cpp.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/path_smoothing_node.dir/src/drivable_region_node.cpp.o" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/path_smoothing_node.dir/src/drivable_region_node.cpp.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/devel/lib/libpath_smoothing.so" afterPath="$PROJECT_DIR$/cmake-build-debug/devel/lib/libpath_smoothing.so" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/devel/lib/path_smoothing/path_smoothing_node" afterPath="$PROJECT_DIR$/cmake-build-debug/devel/lib/path_smoothing/path_smoothing_node" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" afterPath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-log.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/generate_cached_setup.py" afterPath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/generate_cached_setup.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/installspace/_setup_util.py" afterPath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/installspace/_setup_util.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/setup_cached.sh" afterPath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/setup_cached.sh" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/stamps/path_smoothing/_setup_util.py.stamp" afterPath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/stamps/path_smoothing/_setup_util.py.stamp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/stamps/path_smoothing/package.xml.stamp" afterPath="$PROJECT_DIR$/cmake-build-debug/catkin_generated/stamps/path_smoothing/package.xml.stamp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cmake-build-debug/devel/_setup_util.py" afterPath="$PROJECT_DIR$/cmake-build-debug/devel/_setup_util.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h" afterPath="$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cg_solver.cpp" afterPath="$PROJECT_DIR$/src/cg_solver.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/drivable_region_node.cpp" afterPath="$PROJECT_DIR$/src/drivable_region_node.cpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -132,8 +143,8 @@
       <file leaf-file-name="path_smoothing.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/path_smoothing.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="7" column="40" lean-forward="false" selection-start-line="7" selection-start-column="40" selection-end-line="7" selection-end-column="40" />
+            <state relative-caret-position="418">
+              <caret line="22" column="36" lean-forward="false" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
               <folding />
             </state>
           </provider>
@@ -142,12 +153,35 @@
       <file leaf-file-name="drivable_region_node.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/drivable_region_node.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="189">
-              <caret line="356" column="38" lean-forward="false" selection-start-line="356" selection-start-column="38" selection-end-line="356" selection-end-column="38" />
+            <state relative-caret-position="238">
+              <caret line="403" column="18" lean-forward="false" selection-start-line="403" selection-start-column="18" selection-end-line="403" selection-end-column="18" />
               <folding>
                 <element signature="e#38#86#0" expanded="true" />
-                <element signature="e#19662#20952#0" expanded="false" />
+                <element signature="e#964#2993#0" expanded="false" />
+                <element signature="e#2995#3660#0" expanded="false" />
+                <element signature="e#3661#5582#0" expanded="false" />
+                <element signature="e#5584#5954#0" expanded="false" />
+                <element signature="e#7844#8648#0" expanded="false" />
+                <element signature="e#8650#9265#0" expanded="false" />
+                <element signature="e#9267#10534#0" expanded="false" />
+                <element signature="e#10536#11949#0" expanded="false" />
+                <element signature="e#13228#13979#0" expanded="false" />
+                <element signature="e#13981#14726#0" expanded="false" />
+                <element signature="e#14728#15757#0" expanded="false" />
+                <element signature="e#15759#15904#0" expanded="false" />
+                <element signature="e#15906#16039#0" expanded="false" />
+                <element signature="e#20874#22164#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="drivable_region_node.h" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="648">
+              <caret line="73" column="26" lean-forward="false" selection-start-line="73" selection-start-column="26" selection-end-line="73" selection-end-column="26" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -155,11 +189,15 @@
       <file leaf-file-name="cg_solver.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/cg_solver.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="305" column="16" lean-forward="false" selection-start-line="305" selection-start-column="16" selection-end-line="305" selection-end-column="16" />
+            <state relative-caret-position="2584">
+              <caret line="136" column="27" lean-forward="false" selection-start-line="136" selection-start-column="27" selection-end-line="136" selection-end-column="27" />
               <folding>
                 <element signature="e#36#70#0" expanded="true" />
-                <element signature="e#8671#9253#0" expanded="false" />
+                <element signature="e#161#1186#0" expanded="false" />
+                <element signature="e#1187#2409#0" expanded="false" />
+                <element signature="e#5131#6559#0" expanded="false" />
+                <element signature="e#9108#9690#0" expanded="false" />
+                <element signature="e#9691#10872#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -168,19 +206,21 @@
       <file leaf-file-name="cg_solver.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/include/path_smoothing/cg_solver.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="894">
-              <caret line="190" column="5" lean-forward="true" selection-start-line="190" selection-start-column="5" selection-end-line="190" selection-end-column="5" />
+            <state relative-caret-position="114">
+              <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="path_smooth_demo_node.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/path_smooth_demo_node.cpp">
+      <file leaf-file-name="path_smoothing.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/include/path_smoothing/path_smoothing.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1121">
-              <caret line="148" column="47" lean-forward="false" selection-start-line="148" selection-start-column="47" selection-end-line="148" selection-end-column="47" />
-              <folding />
+            <state relative-caret-position="456">
+              <caret line="24" column="5" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+              <folding>
+                <element signature="e#79#103#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -188,8 +228,8 @@
       <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="57">
-              <caret line="3" column="32" lean-forward="false" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
+            <state relative-caret-position="1178">
+              <caret line="62" column="34" lean-forward="false" selection-start-line="62" selection-start-column="34" selection-end-line="62" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -209,17 +249,9 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>w3_</find>
-      <find>cout</find>
-      <find>vehicle_state_</find>
-      <find>amijoSearch</find>
-      <find>is_consider_constraint_</find>
-      <find>is_con</find>
-      <find>is_consi</find>
       <find>numPoint_</find>
       <find>index</find>
       <find>goal_sub</find>
-      <find>internal</find>
       <find>goal_s</find>
       <find>circle</find>
       <find>cos_</find>
@@ -237,8 +269,16 @@
       <find>point_obstacles_</find>
       <find>globalPathCb</find>
       <find>is_consider_boundary_</find>
-      <find>acos_</find>
       <find>global_path_</find>
+      <find>w1_</find>
+      <find>acos_</find>
+      <find>CSVFile</find>
+      <find>nav_msgs</find>
+      <find>origin_path_</find>
+      <find>internal_map</find>
+      <find>internal</find>
+      <find>point_cloud_</find>
+      <find>timerCb</find>
     </findStrings>
     <replaceStrings>
       <replace>DrivableMap</replace>
@@ -265,14 +305,14 @@
         <option value="$PROJECT_DIR$/launch/path_smoothing.launch" />
         <option value="$PROJECT_DIR$/config/smooth_param.params" />
         <option value="$PROJECT_DIR$/config/param.cfg" />
-        <option value="$PROJECT_DIR$/include/path_smoothing/path_smoothing.h" />
-        <option value="$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h" />
         <option value="$PROJECT_DIR$/package.xml" />
         <option value="$PROJECT_DIR$/src/path_smoothing.cpp" />
-        <option value="$PROJECT_DIR$/src/cg_solver.cpp" />
         <option value="$PROJECT_DIR$/include/path_smoothing/cg_solver.h" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/include/path_smoothing/path_smoothing.h" />
+        <option value="$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h" />
         <option value="$PROJECT_DIR$/src/drivable_region_node.cpp" />
+        <option value="$PROJECT_DIR$/src/cg_solver.cpp" />
       </list>
     </option>
   </component>
@@ -284,10 +324,10 @@
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="864" />
-    <option name="y" value="78" />
-    <option name="width" value="929" />
-    <option name="height" value="1028" />
+    <option name="x" value="63" />
+    <option name="y" value="-4" />
+    <option name="width" value="1857" />
+    <option name="height" value="1084" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -336,6 +376,11 @@
             <id>Unused codeC/C++</id>
           </State>
         </expanded-state>
+        <selected-state>
+          <State>
+            <id>BashSupport</id>
+          </State>
+        </selected-state>
       </profile-state>
     </entry>
   </component>
@@ -380,7 +425,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -884,30 +929,38 @@
       <workItem from="1524147413534" duration="3853000" />
       <workItem from="1524185197916" duration="1860000" />
       <workItem from="1524201641872" duration="1007000" />
+      <workItem from="1524238008793" duration="1642000" />
+      <workItem from="1524272343857" duration="11875000" />
+      <workItem from="1524308890715" duration="86000" />
+      <workItem from="1524309008188" duration="604000" />
+      <workItem from="1524311203527" duration="2813000" />
+      <workItem from="1524376638002" duration="2825000" />
+      <workItem from="1524384674241" duration="21000" />
+      <workItem from="1535598412698" duration="1081000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="242678000" />
+    <option name="totallyTimeSpent" value="268689000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="864" y="78" width="1859" height="1092" extended-state="6" />
+    <frame x="63" y="-4" width="1857" height="1084" extended-state="6" />
     <editor active="true" />
     <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21258973" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.39569893" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.16564417" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24086021" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19491993" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1655914" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="LuaJ" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24086021" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32903227" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38387096" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26666668" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
@@ -924,39 +977,31 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/cg_solver.cpp</url>
-          <line>199</line>
-          <option name="timeStamp" value="70" />
-        </line-breakpoint>
-      </breakpoints>
-      <option name="time" value="71" />
+      <option name="time" value="77" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1026">
-          <caret line="57" column="49" lean-forward="false" selection-start-line="57" selection-start-column="49" selection-end-line="57" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1116">
-          <caret line="62" column="40" lean-forward="false" selection-start-line="62" selection-start-column="40" selection-end-line="62" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/drivable_region_node.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="918">
           <caret line="51" column="20" lean-forward="false" selection-start-line="51" selection-start-column="20" selection-end-line="51" selection-end-column="20" />
           <folding>
             <element signature="e#38#86#0" expanded="true" />
-            <element signature="e#19662#20952#0" expanded="false" />
+            <element signature="e#964#2993#0" expanded="false" />
+            <element signature="e#2995#3660#0" expanded="false" />
+            <element signature="e#3661#5582#0" expanded="false" />
+            <element signature="e#5584#5954#0" expanded="false" />
+            <element signature="e#7844#8648#0" expanded="false" />
+            <element signature="e#8650#9265#0" expanded="false" />
+            <element signature="e#9267#10534#0" expanded="false" />
+            <element signature="e#10536#11949#0" expanded="false" />
+            <element signature="e#13228#13979#0" expanded="false" />
+            <element signature="e#13981#14726#0" expanded="false" />
+            <element signature="e#14728#15757#0" expanded="false" />
+            <element signature="e#15759#15904#0" expanded="false" />
+            <element signature="e#15906#16039#0" expanded="false" />
+            <element signature="e#20874#22164#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -981,7 +1026,20 @@
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#38#86#0" expanded="true" />
-            <element signature="e#19662#20952#0" expanded="false" />
+            <element signature="e#964#2993#0" expanded="false" />
+            <element signature="e#2995#3660#0" expanded="false" />
+            <element signature="e#3661#5582#0" expanded="false" />
+            <element signature="e#5584#5954#0" expanded="false" />
+            <element signature="e#7844#8648#0" expanded="false" />
+            <element signature="e#8650#9265#0" expanded="false" />
+            <element signature="e#9267#10534#0" expanded="false" />
+            <element signature="e#10536#11949#0" expanded="false" />
+            <element signature="e#13228#13979#0" expanded="false" />
+            <element signature="e#13981#14726#0" expanded="false" />
+            <element signature="e#14728#15757#0" expanded="false" />
+            <element signature="e#15759#15904#0" expanded="false" />
+            <element signature="e#15906#16039#0" expanded="false" />
+            <element signature="e#20874#22164#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1112,13 +1170,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/path_smoothing/path_smoothing.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="39" column="0" lean-forward="false" selection-start-line="39" selection-start-column="0" selection-end-line="39" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../hmpl/opt_utils/include/opt_utils/circle.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -1147,17 +1198,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="26" column="41" lean-forward="false" selection-start-line="26" selection-start-column="41" selection-end-line="26" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/search.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="252">
           <caret line="14" column="17" lean-forward="true" selection-start-line="14" selection-start-column="17" selection-end-line="14" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/cppad/utility/error_handler.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="205" column="0" lean-forward="false" selection-start-line="205" selection-start-column="0" selection-end-line="205" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../hmpl/opt_utils/include/opt_utils/csv_file.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1691">
+          <caret line="89" column="55" lean-forward="false" selection-start-line="89" selection-start-column="55" selection-end-line="89" selection-end-column="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/ext/string_conversions.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/path_smooth_demo_node.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1638">
+          <caret line="149" column="29" lean-forward="false" selection-start-line="149" selection-start-column="29" selection-end-line="149" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/path_smoothing.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="418">
+          <caret line="22" column="36" lean-forward="false" selection-start-line="22" selection-start-column="36" selection-end-line="22" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/include/path_smoothing/cg_solver.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1169,64 +1257,67 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/path_smoothing.cpp">
+    <entry file="file://$PROJECT_DIR$/include/path_smoothing/path_smoothing.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="7" column="40" lean-forward="false" selection-start-line="7" selection-start-column="40" selection-end-line="7" selection-end-column="40" />
-          <folding />
+        <state relative-caret-position="456">
+          <caret line="24" column="5" lean-forward="false" selection-start-line="24" selection-start-column="5" selection-end-line="24" selection-end-column="5" />
+          <folding>
+            <element signature="e#79#103#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="3" column="32" lean-forward="false" selection-start-line="3" selection-start-column="32" selection-end-line="3" selection-end-column="32" />
+        <state relative-caret-position="1178">
+          <caret line="62" column="34" lean-forward="false" selection-start-line="62" selection-start-column="34" selection-end-line="62" selection-end-column="34" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/include/cppad/utility/error_handler.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="205" column="0" lean-forward="false" selection-start-line="205" selection-start-column="0" selection-end-line="205" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/drivable_region_node.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="189">
-          <caret line="356" column="38" lean-forward="false" selection-start-line="356" selection-start-column="38" selection-end-line="356" selection-end-column="38" />
-          <folding>
-            <element signature="e#38#86#0" expanded="true" />
-            <element signature="e#19662#20952#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/cg_solver.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="305" column="16" lean-forward="false" selection-start-line="305" selection-start-column="16" selection-end-line="305" selection-end-column="16" />
+        <state relative-caret-position="2584">
+          <caret line="136" column="27" lean-forward="false" selection-start-line="136" selection-start-column="27" selection-end-line="136" selection-end-column="27" />
           <folding>
             <element signature="e#36#70#0" expanded="true" />
-            <element signature="e#8671#9253#0" expanded="false" />
+            <element signature="e#161#1186#0" expanded="false" />
+            <element signature="e#1187#2409#0" expanded="false" />
+            <element signature="e#5131#6559#0" expanded="false" />
+            <element signature="e#9108#9690#0" expanded="false" />
+            <element signature="e#9691#10872#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/include/path_smoothing/cg_solver.h">
+    <entry file="file://$PROJECT_DIR$/src/drivable_region_node.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="894">
-          <caret line="190" column="5" lean-forward="true" selection-start-line="190" selection-start-column="5" selection-end-line="190" selection-end-column="5" />
-          <folding />
+        <state relative-caret-position="238">
+          <caret line="403" column="18" lean-forward="false" selection-start-line="403" selection-start-column="18" selection-end-line="403" selection-end-column="18" />
+          <folding>
+            <element signature="e#38#86#0" expanded="true" />
+            <element signature="e#964#2993#0" expanded="false" />
+            <element signature="e#2995#3660#0" expanded="false" />
+            <element signature="e#3661#5582#0" expanded="false" />
+            <element signature="e#5584#5954#0" expanded="false" />
+            <element signature="e#7844#8648#0" expanded="false" />
+            <element signature="e#8650#9265#0" expanded="false" />
+            <element signature="e#9267#10534#0" expanded="false" />
+            <element signature="e#10536#11949#0" expanded="false" />
+            <element signature="e#13228#13979#0" expanded="false" />
+            <element signature="e#13981#14726#0" expanded="false" />
+            <element signature="e#14728#15757#0" expanded="false" />
+            <element signature="e#15759#15904#0" expanded="false" />
+            <element signature="e#15906#16039#0" expanded="false" />
+            <element signature="e#20874#22164#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/path_smooth_demo_node.cpp">
+    <entry file="file://$PROJECT_DIR$/include/path_smoothing/drivable_region_node.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1121">
-          <caret line="148" column="47" lean-forward="false" selection-start-line="148" selection-start-column="47" selection-end-line="148" selection-end-column="47" />
+        <state relative-caret-position="648">
+          <caret line="73" column="26" lean-forward="false" selection-start-line="73" selection-start-column="26" selection-end-line="73" selection-end-column="26" />
           <folding />
         </state>
       </provider>

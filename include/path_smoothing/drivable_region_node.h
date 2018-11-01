@@ -64,6 +64,7 @@ class DrivableMap {
     ros::Timer timer_;
     std::string laneletmap_topic_{"/lanelet_mapserver_node/current_map_msg"};
     nav_msgs::Path global_path_;
+    std::vector<geometry_msgs::Point> origin_path_;
 
     ros::Publisher poly_pub_;
     ros::Publisher path_pub_;

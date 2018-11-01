@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -O3 -DNDEBUG  -shared -Wl,-soname,libsmooth_solver.so -o devel/lib/libsmooth_solver.so CMakeFiles/smooth_solver.dir/src/cg_solver.cpp.o CMakeFiles/smooth_solver.dir/src/path_smoothing.cpp.o -Wl,-rpath,/usr/local/lib /usr/local/lib/libceres.so.1.12.0 -lglog -lgflags -lpthread 

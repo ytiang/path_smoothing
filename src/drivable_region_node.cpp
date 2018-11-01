@@ -15,9 +15,9 @@ void DrivableMap::readParameters() {
             this->nh_.param("/path_smoothing_node/is_save_map", false);
     this->is_consider_boundary_ =
             this->nh_.param("/path_smoothing_node/is_consider_boundary", false);
-    this->w1_ = this->nh_.param("/path_smoothing_node/w1", 10.0);
+    this->w1_ = this->nh_.param("/path_smoothing_node/w1", 20.0);
 
-    this->w2_ = this->nh_.param("/path_smoothing_node/w2", 1.0);
+    this->w2_ = this->nh_.param("/path_smoothing_node/w2", 0.0);
     this->w3_ = this->nh_.param("/path_smoothing_node/w3", 5.0);
 
     std::cout<<"use_self_solver= "<<this->use_self_solver_
@@ -55,6 +55,29 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
     server_ptr_->applyChanges();
     // dynamic parameters
     this->server.setCallback(boost::bind(&DrivableMap::reconfigureRequest, this, _1, _2));
+    //csv path
+    std::string base_dir = ros::package::getPath("path_smoothing");
+    hmpl::CSVReader path_file(base_dir + "/data/with_obs/astar_path.csv");
+    path_file.data_list.erase(path_file.data_list.begin());
+    for(const auto &pt : path_file.data_list) {
+        size_t id;
+        geometry_msgs::Point point;
+        point.x = std::stod(pt[1], &id);
+        point.y = std::stod(pt[2], &id);
+        point.z = 0;
+
+        if(origin_path_.empty()) {
+            this->origin_path_.push_back(point);
+        } else {
+            double dx = origin_path_.back().x - point.x;
+            double dy = origin_path_.back().y - point.y;
+            double dist = sqrt(pow(dx, 2) + pow(dy, 2));
+            if(dist > 1.5) {
+                origin_path_.push_back(point);
+            }
+        }
+    }
+    int z = 10;
 }
 
 void DrivableMap::reconfigureRequest(const path_smoothing::smoothConfig &config,
@@ -353,7 +376,7 @@ void DrivableMap::globalPathCb(const nav_msgs::PathConstPtr &path) {
         if(!this->global_path_.poses.empty()) {
             double dist = sqrt(pow(it.pose.position.x-global_path_.poses.back().pose.position.x,2) +
                                        pow(it.pose.position.y-global_path_.poses.back().pose.position.y,2));
-            if(dist > 1.0) {
+            if(dist > 1.5) {
 //                geometry_msgs::PoseStamped pose = it;
 //                pose.pose.position.x = (global_path_.poses.back().pose.position.x + it.pose.position.x)/2;
 //                pose.pose.position.y = (global_path_.poses.back().pose.position.y + it.pose.position.y)/2;
@@ -380,79 +403,84 @@ void DrivableMap::goalCb(const geometry_msgs::PoseStamped &pose) {
 
 void DrivableMap::timerCb() {
     updateSignDistanceField();
-    if(is_locate_ && is_set_goal_) {
-        if(!global_path_.poses.empty()) {
-//            this->is_save_map_ = true;
-            if (this->is_save_map_) {
-                std::string base_dir = ros::package::getPath("path_smoothing");
-                hmpl::CSVFile dis_map(base_dir + "/astar_path.csv");
-                dis_map << "x" << "y" << hmpl::endrow;
-                for(const auto &pt:this->global_path_.poses) {
-                    dis_map << pt.pose.position.x << pt.pose.position.y << hmpl::endrow;
-//                dis_map << "dx" << "dy" << "cost" << hmpl::endrow;
-//                for (grid_map::GridMapIterator it(this->internal_grid_map_.maps);
-//                     !it.isPastEnd(); ++it) {
-//                    grid_map::Position pos;
-//                    this->internal_grid_map_.maps.getPosition(*it, pos);
-//                    grid_map::Index index;
-//                    this->internal_grid_map_.maps.getIndex(pos, index);
-//                    dis_map << index(0)
-//                            << index(1)
-//                            << this->internal_grid_map_.maps.at(
-//                                    internal_grid_map_.dis, *it)
-//                            << hmpl::endrow;
-                }
-                this->is_save_map_ = false;
-            }
-            std::cout << "timeCb" << std::endl;
-            this->use_self_solver_ = true;
-            this->is_consider_boundary_ = false;
-            if (this->use_self_solver_) {
-                auto start = hmpl::now();
-                CG_Solver smooth_solver(
-                        this->global_path_,
-                        this->w1_,
-                        this->w2_,
-                        this->w3_,
-                        this->is_consider_boundary_,
-                        this->internal_grid_map_.maps);
-                smooth_solver.Solve();
-                auto end = hmpl::now();
-                std::cout << "self_solver time: " << hmpl::getDurationInSecs(start, end)
-                          << std::endl;
-//                std::cout <<"smooth path size: " << smooth_solver.getSmoothPath().poses.size() << std::endl;
-                this->path_pub_.publish(smooth_solver.getSmoothPath());
-            } else {
-                /// ceres solver
-                auto start = hmpl::now();
-                PathSmooth *path_smooth = new PathSmooth(global_path_,
-                                                         this->w1_,
-                                                         this->w2_,
-                                                         this->w3_,
-                                                         is_consider_boundary_,
-                                                         this->internal_grid_map_.maps);
-                ceres::GradientProblem problem(path_smooth);
-                ceres::GradientProblemSolver::Options options;
-                options.minimizer_progress_to_stdout = false;
-        //            options.line_search_direction_type = ceres::NONLINEAR_CONJUGATE_GRADIENT;
-                options.nonlinear_conjugate_gradient_type = ceres::POLAK_RIBIERE;
-        //            options.line_search_type = ceres::ARMIJO;
-                options.line_search_interpolation_type = ceres::BISECTION;
-                options.min_line_search_step_size = 1e-2;
-                options.function_tolerance = 1e-3;
-                options.gradient_tolerance = 1e-3;
-                options.parameter_tolerance = 1e-3;
-                options.line_search_sufficient_function_decrease = 0.1;
-                ceres::GradientProblemSolver::Summary summary;
-                ceres::Solve(options, problem, path_smooth->Xi, &summary);
-                auto end = hmpl::now();
-                std::cout << "ceres time: " << hmpl::getDurationInSecs(start, end)
-                          << std::endl;
-                this->path_pub_.publish(path_smooth->getSmoothPath());
-            }
-        }
-        global_path_.poses.clear();
-    }
+    CG_Solver smoother(this->origin_path_);
+    smoother.Solve();
+    this->path_pub_.publish(smoother.getSmoothPath());
+//    if(is_locate_ && is_set_goal_) {
+//        if(!global_path_.poses.empty()) {
+//            std::cout << "timeCb" << std::endl;
+//            this->use_self_solver_ = true;
+//            this->is_consider_boundary_ = false;
+//            if (this->use_self_solver_) {
+//                auto start = hmpl::now();
+////                CG_Solver smooth_solver(
+////                        this->global_path_,
+////                        this->w1_,
+////                        this->w2_,
+////                        this->w3_,
+////                        this->is_consider_boundary_,
+////                        this->internal_grid_map_.maps);
+//                CG_Solver smooth_solver(this->origin_path_);
+//                smooth_solver.Solve();
+//                auto end = hmpl::now();
+//                std::cout << "self_solver time: " << hmpl::getDurationInSecs(start, end)
+//                          << std::endl;
+////                std::cout <<"smooth path size: " << smooth_solver.getSmoothPath().poses.size() << std::endl;
+//                this->path_pub_.publish(smooth_solver.getSmoothPath());
+//                this->is_save_map_ = true;
+//                if (this->is_save_map_) {
+//                    std::string base_dir = ros::package::getPath("path_smoothing");
+//                    hmpl::CSVFile dis_map(base_dir + "/astar_path.csv");
+//                    dis_map << "x" << "y" << hmpl::endrow;
+//                    for(const auto &pt:this->global_path_.poses) {
+//                        dis_map << pt.pose.position.x << pt.pose.position.y << hmpl::endrow;
+////                        dis_map << "dx" << "dy" << "cost" << hmpl::endrow;
+////                for (grid_map::GridMapIterator it(this->internal_grid_map_.maps);
+////                     !it.isPastEnd(); ++it) {
+////                    grid_map::Position pos;
+////                    this->internal_grid_map_.maps.getPosition(*it, pos);
+////                    grid_map::Index index;
+////                    this->internal_grid_map_.maps.getIndex(pos, index);
+////                    dis_map << index(0)
+////                            << index(1)
+////                            << this->internal_grid_map_.maps.at(
+////                                    internal_grid_map_.dis, *it)
+////                            << hmpl::endrow;
+//                    }
+//
+//                    this->is_save_map_ = false;
+//                }
+//            } else {
+//                /// ceres solver
+//                auto start = hmpl::now();
+//                PathSmooth *path_smooth = new PathSmooth(global_path_,
+//                                                         this->w1_,
+//                                                         this->w2_,
+//                                                         this->w3_,
+//                                                         is_consider_boundary_,
+//                                                         this->internal_grid_map_.maps);
+//                ceres::GradientProblem problem(path_smooth);
+//                ceres::GradientProblemSolver::Options options;
+//                options.minimizer_progress_to_stdout = false;
+//        //            options.line_search_direction_type = ceres::NONLINEAR_CONJUGATE_GRADIENT;
+//                options.nonlinear_conjugate_gradient_type = ceres::POLAK_RIBIERE;
+//        //            options.line_search_type = ceres::ARMIJO;
+//                options.line_search_interpolation_type = ceres::BISECTION;
+//                options.min_line_search_step_size = 1e-2;
+//                options.function_tolerance = 1e-3;
+//                options.gradient_tolerance = 1e-3;
+//                options.parameter_tolerance = 1e-3;
+//                options.line_search_sufficient_function_decrease = 0.1;
+//                ceres::GradientProblemSolver::Summary summary;
+//                ceres::Solve(options, problem, path_smooth->Xi, &summary);
+//                auto end = hmpl::now();
+//                std::cout << "ceres time: " << hmpl::getDurationInSecs(start, end)
+//                          << std::endl;
+//                this->path_pub_.publish(path_smooth->getSmoothPath());
+//            }
+//        }
+//        global_path_.poses.clear();
+//    }
 
     ros::Time time = ros::Time::now();
     this->internal_grid_map_.maps.setTimestamp(time.toNSec());

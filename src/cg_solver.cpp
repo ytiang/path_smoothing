@@ -114,8 +114,18 @@ CG_Solver::CG_Solver(const nav_msgs::Path &path,
                 hmpl::eigen2cv(this->gridmap_.get("distance"));
         cv::Mat grad_x = hmpl::eigen2cv(this->map_grad.get("grad_x"));
         cv::Mat grad_y = hmpl::eigen2cv(this->map_grad.get("grad_y"));
-        cv::Sobel(dis_field, grad_x, CV_32F, 0, 1);
-        cv::Sobel(dis_field, grad_y, CV_32F, 1, 0);
+        cv::Mat kernal_x(2, 2, CV_32FC1);
+        cv::Mat kernal_y(2, 2, CV_32FC1);
+        kernal_y.at<float>(0, 0) = 1;
+        kernal_y.at<float>(0, 1) = 0;
+        kernal_y.at<float>(1, 0) = -1;
+        kernal_y.at<float>(1, 1) = 0;
+        kernal_x.at<float>(0, 0) = 1;
+        kernal_x.at<float>(0, 1) = -1;
+        kernal_x.at<float>(1, 0) = 0;
+        kernal_x.at<float>(1, 1) = 0;
+        cv::filter2D(dis_field, grad_x, -1, kernal_x, cv::Point(0, 0), 0);
+        cv::filter2D(dis_field, grad_y, -1, kernal_y, cv::Point(0, 0), 0);
         // note: opencv's coordinate is different from eigen
         std::cout << "self solver init: " << numPoint << std::endl;
     }
@@ -197,7 +207,7 @@ void CG_Solver::Solve() {
     double F_old = 0;
     int solve_count = 0;
     std::cout << "ready to itration" << std::endl;
-    for(int i=0; i<400; i++){
+    for(int i=0; i<400; i++) {
         alpha = this->amijoSearch(this->Xk, d, g, F[0]);
         this->Xk = add_(this->Xk , multi_(alpha , d));
         F_old = F[0];
