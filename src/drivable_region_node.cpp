@@ -5,7 +5,6 @@
 #include "path_smoothing/cg_solver.h"
 #include "path_smoothing/path_smoothing.h"
 #include <ros/package.h>
-#include <astar_planner/astar_search.h>
 //#include ""
 
 void DrivableMap::readParameters() {

@@ -22,7 +22,6 @@ set(catkin_deps
   visualization_msgs
   dynamic_reconfigure
   rosparam_handler
-  astar_planner
 )
 
 find_package(catkin REQUIRED COMPONENTS
