@@ -39,6 +39,9 @@ install_manifest.txt
 build
 lib
 bin
+devel
+logs
+unline_data
 
 # Text editor temporary files
 *~
@@ -73,7 +76,5 @@ heuristic_info.txt
 
 # ignore .gpx files
 *.gpx
-
-# ignore state_samling benchmark generated files
-state_sampling/benchmark/data8_100/
-state_sampling/benchmark/car_geometry.yaml
+*.bag
+packages/
