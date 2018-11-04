@@ -16,24 +16,18 @@
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>tf2_ros</depend>
-  <depend>tf2</depend>
-  <depend>tf2_geometry_msgs</depend>
   <depend>roscpp</depend>
   <depend>geometry_msgs</depend>
   <depend>opt_utils</depend>
   <depend>roslib</depend>
   <depend>internal_grid_map</depend>
-  <depend>grid_map_ros</depend>
   <depend>nav_msgs</depend>
-  <depend>anm_msgs</depend>
   <depend>interactive_markers</depend>
-  <depend>lanelet_map_msgs</depend>
   <depend>grid_map_visualization</depend>
   <depend>visualization_msgs</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>rosparam_handler</depend>
-  <depend>astar_planner</depend>
+  <depend>space_explore</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

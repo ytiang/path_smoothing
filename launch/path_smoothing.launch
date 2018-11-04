@@ -1,8 +1,4 @@
 <launch>
-    <node pkg="lanelet_map_server" type="lanelet_mapserver_node" name="lanelet_mapserver_node" args="" output="screen" >
-        <rosparam command="load" file="$(find lanelet_map_server)/config/config.yaml"/>
-    </node>
-
     <node pkg="path_smoothing" type="path_smoothing_node" name="path_smoothing_node" args="" output="screen" >
          <rosparam command="load" file="$(find path_smoothing)/config/config.yaml" />
     </node>

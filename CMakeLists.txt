@@ -1,27 +1,21 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(path_smoothing)
-#set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release")
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
 set(catkin_deps
   opt_utils
-  tf2
-  tf2_ros
-  tf2_geometry_msgs
   roslib
   roscpp
-  grid_map_ros
-  grid_map_visualization
   nav_msgs
-  anm_msgs
   geometry_msgs
   interactive_markers
-  lanelet_map_msgs
   internal_grid_map
   visualization_msgs
   dynamic_reconfigure
   rosparam_handler
+  space_explore
 )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -74,12 +68,19 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
   ${CERES_LIBRARIES})
 
+add_library(chomp_optimizer
+  src/chomp.cpp)
+target_link_libraries(chomp_optimizer
+  ${catkin_LIBRARIES})
+
 add_executable(${PROJECT_NAME}_node
   src/drivable_region_node.cpp)
 add_dependencies(${PROJECT_NAME}_node  ${PROJECT_NAME}_gencfg)
+
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
-        ${PROJECT_NAME})
+#  ${PROJECT_NAME}
+  chomp_optimizer)
 
 
