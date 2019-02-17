@@ -4,8 +4,8 @@
 #include <ros/ros.h>
 #include <rviz_visual_tools/rviz_visual_tools.h>
 #include <lanelet_map_msgs/GlobalPath.h>
-#include "path_smooth/cg_solver.h"
-#include "path_smooth/path_smoothing.h"
+#include "path_smoothing/cg_solver.h"
+#include "path_smoothing/path_smoothing.h"
 #include <opt_utils/opt_utils.hpp>
 
 #include <stdio.h>

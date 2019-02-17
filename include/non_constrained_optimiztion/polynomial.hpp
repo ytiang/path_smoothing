@@ -1,0 +1,7 @@
+//
+// Created by yangt on 19-2-17.
+//
+
+#ifndef PATH_SMOOTHING_POLYNOMIAL_HPP
+#define PATH_SMOOTHING_POLYNOMIAL_HPP
+#endif //PATH_SMOOTHING_POLYNOMIAL_HPP

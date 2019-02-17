@@ -14,15 +14,23 @@ typedef Eigen::VectorXd Vector;
 typedef Eigen::MatrixXd Matrix;
 class ChompOptimizer {
  public:
-    // constructor
+    //! A normal member taking two arguments and returning an integer value.
+    /**
+     *
+     * @param init_guses
+     * @param signedDistanceField
+     */
     ChompOptimizer(std::vector<geometry_msgs::Point> init_guses,
                    grid_map::GridMap &signedDistanceField);
     nav_msgs::Path generatePath();
  private:
-    // number of sampled points
+    //! number of sampled points
     size_t n_;
 
-    // dimension of configration
+    //! dimension of configuration space
+    /*!
+     * detailed description
+     */
     size_t cdim_;
 
     // dimension of trajectory
@@ -50,7 +58,6 @@ class ChompOptimizer {
     // gradient of distance field
     grid_map::GridMap sdfGradient_;
 
-    // function
     double chompIteration(Vector *x, double *obs_cost,
                           double namda);
     double getObstacleCost(const Vector &xi);

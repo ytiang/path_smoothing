@@ -71,7 +71,7 @@ class DrivableMap {
 
     // obstacle server related
     std::vector<hmpl::Circle> point_obstacles_;
-    double circle_radius_{5};
+    double circle_radius_{1.5};
     int circle_obstacle_num_{5};
     
     // interactive marker
