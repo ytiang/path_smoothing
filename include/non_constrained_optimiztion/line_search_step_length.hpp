@@ -120,9 +120,10 @@ class WolfSearch : public LineSearchStepLength {
   virtual bool DoSearch(const State &initial_state,
                         Summary *summary);
 
-  double Zoom(const State &initial_state,
+  bool Zoom(const State &initial_state,
               Samples *s_lo,
               Samples *s_hi,
+              double *step,
               Summary *summary);
 
  private:

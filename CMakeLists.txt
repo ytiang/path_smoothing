@@ -30,7 +30,8 @@ find_package(Boost COMPONENTS filesystem REQUIRED)
 find_package(OpenCV 3 REQUIRED)
 find_package(Eigen3 QUIET)
 find_package(Ceres REQUIRED)
-#find_package(benchmark)
+
+find_package(casadi REQUIRED)
 
 find_library(GLOG glog)
 
@@ -81,11 +82,25 @@ target_link_libraries(ncopt_lib
         ${EIGEN3_LIBRARIES}
         ${GLOG})
 
-add_executable(steepest_decent_demo
-        test/test_steepest_decent.cpp)
-target_link_libraries(steepest_decent_demo
+add_library(path_smoothing
+        src/path_smoothing/path_smoothing.cpp
+        src/path_smoothing/evaluator.cpp)
+target_link_libraries(path_smoothing
         ncopt_lib
-        ${CERES_LIBRARIES})
+        casadi
+        ${catkin_LIBRARIES})
+
+add_executable(path_smoothing_demo
+        test/test_path_smoothing.cpp)
+target_link_libraries(path_smoothing_demo
+        path_smoothing
+        ${catkin_LIBRARIES})
+
+#add_executable(steepest_decent_demo
+#        test/test_steepest_decent.cpp)
+#target_link_libraries(steepest_decent_demo
+#        ncopt_lib
+#        ${CERES_LIBRARIES})
 
 
 #add_library(${PROJECT_NAME}

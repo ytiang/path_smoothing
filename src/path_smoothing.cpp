@@ -1,4 +1,4 @@
-#include "path_smoothing/path_smoothing.h"
+#include "path_smoothing/path_smoothing_old.h"
 
 int PathSmooth::NumParameters() const {
     return this->numParam_;

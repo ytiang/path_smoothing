@@ -39,6 +39,7 @@ class Summary {
   double gradien_norm_decrement;
   int solve_iteration_count;
   int line_search_iteration_count;
+  int search_step_fail_count;
   LineSearchDirectionType line_search_direction_type;
   LineSearchType step_length_type;
   TerminationType termination_type;
@@ -56,9 +57,9 @@ class Summary {
                      "  step length type: %s\n"
                      "  Iterations: %d\n"
                      "  Cost: %f\n"
-                     "  Cost decrement: %f\n"
+                     "  Cost change: %f\n"
                      "  Gradient norm: %f\n"
-                     "  Gradient decrement: %f\n"
+                     "  Gradient norm change: %f\n"
                      "  Termination type: %s\n",
              LineSearchDirectionTypeToString(summary.line_search_direction_type),
              LIneSearchStepTypeToString(summary.step_length_type),

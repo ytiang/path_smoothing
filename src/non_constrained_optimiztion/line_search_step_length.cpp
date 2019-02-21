@@ -15,6 +15,7 @@ void StepLengthFunction::Evaluate(double step,
                                   Samples *output) {
     output->a = step;
     output->vector_x = position_ + step * direction_;
+
     if (!is_evaluate_gradient) {
         problem_->Evaluate(output->vector_x.data(), &(output->value), NULL);
         output->is_gradient_valid = false;
@@ -104,7 +105,7 @@ Vector LineSearchStepLength::PolynomialInterpolating(
             }
             rhs(row) = sample.value;
             row++;
-            if(row == degree) {
+            if (row == degree) {
                 break;
             }
         }
@@ -114,14 +115,14 @@ Vector LineSearchStepLength::PolynomialInterpolating(
             }
             rhs(row) = sample.gradient;
             row++;
-            if(row == degree) {
+            if (row == degree) {
                 break;
             }
         }
     }
-//    return M.lu().solve(rhs);
-    Eigen::FullPivLU<Matrix> lu(M);
-    return lu.setThreshold(0.0).solve(rhs);
+    return M.lu().solve(rhs);
+//    Eigen::FullPivLU<Matrix> lu(M);
+//    return lu.setThreshold(0.0).solve(rhs);
 }
 
 double LineSearchStepLength::InterpolateMinimizingStepLength(
@@ -141,7 +142,7 @@ double LineSearchStepLength::InterpolateMinimizingStepLength(
 
     const Vector polynomial = PolynomialInterpolating(samples);
 
-    if(polynomial.size() < 3) {
+    if (polynomial.size() < 3) {
         std::cout << polynomial << "\n";
     }
 
@@ -209,11 +210,11 @@ bool ArimjoSearch::DoSearch(const State &initial_state,
         }
         // choose optimal step length by funciton approximation
         double new_step = InterpolateMinimizingStepLength(
-                            initial_state,
-                            previous,
-                            current,
-                            current.a * options().max_step_decrease_rate,
-                            current.a * options().min_step_decrease_rate);
+                initial_state,
+                previous,
+                current,
+                current.a * options().max_step_decrease_rate,
+                current.a * options().min_step_decrease_rate);
 
         // update samples
         previous = current;
@@ -236,9 +237,10 @@ WolfSearch::WolfSearch(const LineSearchOption &option,
 
 }
 
-double WolfSearch::Zoom(const State &initial_state,
+bool WolfSearch::Zoom(const State &initial_state,
                         Samples *s_lo,
                         Samples *s_hi,
+                        double *step,
                         Summary *summary) {
     // interpolate between al and ah, than find min ai
     const double &cost0 = initial_state.cost;
@@ -254,13 +256,15 @@ double WolfSearch::Zoom(const State &initial_state,
                 std::min(s_lo->a, s_hi->a) / options().min_step_decrease_rate;
         upper_step =
                 std::max(s_lo->a, s_hi->a) * options().min_step_decrease_rate;
-        double step =
+        *step =
                 InterpolateMinimizingStepLength(initial_state, *s_lo, *s_hi,
                                                 lower_step, upper_step);
-        function()->Evaluate(step, true, &current);
-        if(fabs(s_hi->a-s_lo->a) < 1e-6) {
-            LOG(ERROR) << "Zoom Section: [" << s_lo->a << ", "
-                         << s_hi->a << "] doesn't contain aviable step length!!";
+        function()->Evaluate(*step, true, &current);
+        if(fabs(s_hi->a - s_lo->a) < 1e-7) {
+            LOG(WARNING)
+                << "Zoom Section: [" << s_lo->a << ", "
+                << s_hi->a << "] doesn't contain aviable step length!!";
+            return false;
         }
         if (current.value > cost0 + c1 * current.a * dird0
                 || current.value >= s_lo->value) {
@@ -268,14 +272,15 @@ double WolfSearch::Zoom(const State &initial_state,
         } else {
             // curvature sufficient decrease condition:
             if (fabs(current.gradient) <= -c2 * dird0) {
-                return current.a;
+                *step = current.a;
+                return true;
             }
             if (current.gradient * (s_hi->a - s_lo->a) >= 0) {
                 *s_hi = *s_lo;
             }
             *s_lo = current;
         }
-        summary->line_search_iteration_count ++;
+        summary->line_search_iteration_count++;
     }
 }
 
@@ -287,18 +292,20 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
     const double &c2 = options().sufficient_curvature_decrease;
 
     summary->line_search_iteration_count = 1;
-    Samples current, upper;
+    Samples current;//, upper;
     Samples previous
             (0, initial_state.cost, initial_state.directional_derivative);
-    function()->Evaluate(summary->initial_step / 2, true, &current);
-    function()->Evaluate(summary->initial_step, true, &upper);
+    function()->Evaluate(summary->initial_step, true, &current);
+//    function()->Evaluate(summary->initial_step, true, &upper);
     double step = 0.0;
 
     while (true) {
         if (current.value > cost0 + c1 * current.a * dird0 ||
                 (current.value >= previous.value &&
                         summary->line_search_iteration_count > 1)) {
-            step = Zoom(initial_state, &previous, &current, summary);
+            if(!Zoom(initial_state, &previous, &current, &step, summary)) {
+                return false;
+            }
             break;
         }
 
@@ -308,16 +315,18 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
             break;
         }
         if (current.gradient >= 0) {
-            step = Zoom(initial_state, &current, &previous, summary);
+            if(!Zoom(initial_state, &current, &previous, &step, summary)) {
+                return false;
+            }
             break;
         }
         // choose step length by approximation
         double new_step = InterpolateMinimizingStepLength(
-                            initial_state,
-                            current,
-                            upper,
-                            current.a / options().min_step_decrease_rate,
-                            upper.a * options().min_step_decrease_rate);
+                initial_state,
+                previous,
+                current,
+                current.a,
+                current.a * 10);
         previous = current;
         function()->Evaluate(new_step, true, &current);
         summary->line_search_iteration_count++;

@@ -67,6 +67,7 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
 
     VectorRef param(param_ptr, problem->NumberOfParams());
     summary->solve_iteration_count = 0;
+    summary->search_step_fail_count = 0;
 
     while (summary->solve_iteration_count <
             minimizer_option_.max_solve_iterations_num) {
@@ -99,9 +100,17 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
                 GetInitialStepLength(previous_state, current_state, *summary);
         function.Init(param, current_state.search_direction);
         if (!(step_length_sercher->DoSearch(current_state, summary))) {
-            summary->message = "No aviliable step length!";
-            summary->termination_type = NO_AVILIABLE_STEP_LENGTH;
-            return false;
+            summary->search_step_fail_count++;
+            current_state.search_direction = -current_state.gradient;
+            current_state.directional_derivative =
+                    current_state.gradient.dot(current_state.search_direction);
+            if (summary->search_step_fail_count > 20
+                    || !(step_length_sercher->DoSearch(current_state,
+                                                       summary))) {
+                summary->message = "No aviliable step length!";
+                summary->termination_type = NO_AVILIABLE_STEP_LENGTH;
+                return false;
+            }
         }
 
         previous_state = current_state;
