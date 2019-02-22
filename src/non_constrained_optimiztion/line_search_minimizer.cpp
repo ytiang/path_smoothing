@@ -58,14 +58,14 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
     LineSearchDirection *direction_sercher =
             LineSearchDirection::Create(line_search_option);
 
-    State current_state(problem->NumberOfParams());
-    State previous_state(problem->NumberOfParams());
+    State current_state(problem->NumParameters());
+    State previous_state(problem->NumParameters());
     problem->Evaluate(param_ptr, &(current_state.cost),
                       current_state.gradient.data());
     current_state.gradient_norm = current_state.gradient.norm();
     previous_state.step_length = -1;
 
-    VectorRef param(param_ptr, problem->NumberOfParams());
+    VectorRef param(param_ptr, problem->NumParameters());
     summary->solve_iteration_count = 0;
     summary->search_step_fail_count = 0;
 

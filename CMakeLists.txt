@@ -69,6 +69,9 @@ include_directories(
         ${CERES_INCLUDE_DIRS}
 )
 
+message("ceres include: " ${CERES_INCLUDE_DIRS})
+message("ceres library: " ${CERES_LIBRARIES})
+
 #MESSAGE(STATUS "yt:=  " ${catkin_INCLUDE_DIRS})
 
 add_library(ncopt_lib
@@ -83,11 +86,12 @@ target_link_libraries(ncopt_lib
         ${GLOG})
 
 add_library(path_smoothing
-        src/path_smoothing/path_smoothing.cpp
+        include/path_smoothing/path_smoothing.hpp
         src/path_smoothing/evaluator.cpp)
 target_link_libraries(path_smoothing
         ncopt_lib
         casadi
+        ${CERES_LIBRARIES}
         ${catkin_LIBRARIES})
 
 add_executable(path_smoothing_demo

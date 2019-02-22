@@ -9,13 +9,12 @@ namespace ncopt {
 
 class GradientProblem {
  public:
-  virtual int NumberOfParams() = 0;
+  virtual int NumParameters() const = 0;
 
-  virtual bool Evaluate(double *current_state, double *cost,
-                        double *gradient) = 0;
+  virtual bool Evaluate(const double *current_state, double *cost,
+                        double *gradient) const = 0;
 
   virtual ~GradientProblem() {
-      std::cout << "GradientProblem Over!!!\n";
   }
 };
 

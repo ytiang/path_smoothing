@@ -16,7 +16,7 @@ class BasicOption {
       function_tolerance = 1e-6;
       gradient_norm_tolerance = 1e-6;
       gradine_norm_threshold = 1e-3;
-      max_solve_iterations_num = 50;
+      max_solve_iterations_num = 70;
   }
   MinimizerType minimizer_type;
   double function_tolerance;
@@ -30,14 +30,14 @@ class LineSearchOption {
   LineSearchType line_search_type = WOLFE;
   LineSearchInterpolationType interpolation_type = QUADRATIC;
   LineSearchDirectionType line_search_direction_type = //STEEPEST_DESCENT;
-         NONLINEAR_CONJUGATE_GRADIENT;
+          NONLINEAR_CONJUGATE_GRADIENT;
   NonlinearConjugateGradientType nonlinear_conjugate_gradient_type =
-          FR_PR;
+          FLETCHER_REEVES;
   double sufficient_decrease = 1e-4;
-  double sufficient_curvature_decrease = 0.4;
+  double sufficient_curvature_decrease = 0.3;
   double min_line_search_step_length = 1e-16;
   double max_step_decrease_rate = 1e-3;
-  double min_step_decrease_rate = 0.9;
+  double min_step_decrease_rate = 0.92;
 };
 
 class GradientProblemOption : public BasicOption, public LineSearchOption {

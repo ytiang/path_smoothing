@@ -8,16 +8,23 @@
 #include <cppad/cppad.hpp>
 #include <casadi/casadi.hpp>
 #include <Eigen/Core>
-#include <geometry_msgs/Point.h>
+#include "non_constrained_optimiztion/gradient_problem.hpp"
+#include <ceres/ceres.h>
 
 namespace path_smoothing {
 
-enum EvaluatorType {
+enum DifferenceType {
   CPPAD,
   CASADI,
 };
 
-class Evaluator {
+enum SolverType {
+  SELF_SOLVER,
+  CERES_SOLVER
+};
+
+class Evaluator
+   : public ncopt::GradientProblem, public ceres::FirstOrderFunction {
  public:
   typedef CppAD::AD<double> CppADScalar;
   typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
@@ -38,7 +45,7 @@ class Evaluator {
     double heading_term_coe;
     double curvature_term_coe;
     double obstacle_term_coe;
-    EvaluatorType type;
+    DifferenceType type;
     Vector start;
     Vector end;
   };
@@ -56,10 +63,8 @@ class Evaluator {
 
   virtual ~Evaluator() {}
 
-//  template<class PointType>
-  typedef geometry_msgs::Point PointType;
   static Evaluator *createEvaluator(const Settings &settings,
-                                    const std::vector<PointType> &param);
+                                    const Vector &param);
 
   friend inline CppADScalar cos(const CppADScalar &x) {
       return x.cos_me();
@@ -74,18 +79,20 @@ class Evaluator {
       return x.acos_me();
   }
 
-  inline int numParameters() const {
-      return settings_.param_num;
-  }
-
   inline int degree() const {
       return settings_.degree;
   }
 
   template<class ScalarType, class VectorType>
-  ScalarType targetFunction(VectorType x);
+  ScalarType targetFunction(VectorType x) const;
 
-  virtual void evaluate(double *x, double *cost, double *gradient) = 0;
+  virtual bool Evaluate(const double *x,
+                        double *cost,
+                        double *gradient) const = 0;
+
+  virtual inline int NumParameters() const {
+      return settings_.param_num;
+  }
 
  private:
   const Settings &settings_;
@@ -93,18 +100,17 @@ class Evaluator {
 
 class CppADEvalator : public Evaluator {
  public:
-//  template<class PointType>
-  CppADEvalator(const Settings &settings, const std::vector<PointType> &param);
-  virtual void evaluate(double *x, double *cost, double *gradient);
+  CppADEvalator(const Settings &settings, const Vector &param);
+  virtual bool Evaluate(const double *x, double *cost, double *gradient) const;
 
  private:
-  CppAD::ADFun<double> gradient_;
+  CppAD::ADFun<double> *gradient_;
 };
 
 class CasadiEvaluator : public Evaluator {
  public:
   CasadiEvaluator(const Settings &settings);
-  virtual void evaluate(double *x, double *cost, double *gradient);
+  virtual bool Evaluate(const double *x, double *cost, double *gradient) const;
  private:
   casadi::Function gradient_;
 };

@@ -6,8 +6,8 @@
 namespace ncopt {
 StepLengthFunction::StepLengthFunction(GradientProblem *problem)
         : problem_(problem),
-          position_(problem->NumberOfParams()),
-          direction_(problem->NumberOfParams()) {
+          position_(problem->NumParameters()),
+          direction_(problem->NumParameters()) {
 }
 
 void StepLengthFunction::Evaluate(double step,

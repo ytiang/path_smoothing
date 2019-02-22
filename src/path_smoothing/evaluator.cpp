@@ -11,8 +11,8 @@ Evaluator::Evaluator(const Settings &settings) : settings_(settings) {
 
 //template<class PointType>
 Evaluator *Evaluator::createEvaluator(const Settings &settings,
-                                      const std::vector<PointType> &param) {
-    CHECK_EQ(settings.param_num, (param.size() - 2) * 2)
+                                      const Vector &param) {
+    CHECK_EQ(settings.param_num, param.size())
         << "setting parameters' number is different from the size of input param!!!";
     switch (settings.type) {
         case CPPAD:return new CppADEvalator(settings, param);
@@ -21,7 +21,7 @@ Evaluator *Evaluator::createEvaluator(const Settings &settings,
 }
 
 template<class ScalarType, class VectorType>
-ScalarType Evaluator::targetFunction(VectorType x) {
+ScalarType Evaluator::targetFunction(VectorType x) const {
     CHECK_GT(degree(), 0) << "invalid degree information :"
                           << degree();
     CHECK_GT(settings_.param_num, degree())
@@ -54,47 +54,51 @@ ScalarType Evaluator::targetFunction(VectorType x) {
     return value;
 }
 
-//template<class PointType>
 CppADEvalator::CppADEvalator(const Settings &settings,
-                             const std::vector<PointType> &param)
+                             const Vector &param)
         : Evaluator(settings) {
     NewVector<CppADScalar> x(settings.param_num);
     NewVector<CppADScalar> y(1);
-    for (int i = 1; i < param.size() - 1; ++i) {
-        const int j = i - 1;
-        x.at(j * degree()) = param.at(i).x;
-        x.at(j * degree() + 1) = param.at(i).y;
+    for (int i = 0; i < NumParameters(); ++i) {
+        x.at(i) = param(i);
+        x.at(i) = param(i);
     }
     CppAD::Independent(x);
     y[0] = this->targetFunction<CppADScalar>(x);
-    gradient_ = CppAD::ADFun<double>(x, y);
+    gradient_ = new CppAD::ADFun<double>(x, y);
 }
-void CppADEvalator::evaluate(double *x, double *cost, double *gradient) {
+bool CppADEvalator::Evaluate(const double *x,
+                             double *cost,
+                             double *gradient) const {
     if (cost != NULL) {
-        VectorRef x_ref(x, numParameters());
+        VectorRef x_ref(const_cast<double *>(x), NumParameters());
         *cost = targetFunction<double>(x_ref);
     }
     if (gradient != NULL) {
-        std::vector<double> var(x, x + numParameters());
-        std::vector<double> value = gradient_.Jacobian(var);
+        std::vector<double> var(x, x + NumParameters());
+        std::vector<double> value = gradient_->Jacobian(var);
         for (int i(0); i < value.size(); ++i) {
             *(gradient + i) = value.at(i);
         }
     }
+    return true;
 }
 
-void CasadiEvaluator::evaluate(double *x, double *cost, double *gradient) {
+bool CasadiEvaluator::Evaluate(const double *x,
+                               double *cost,
+                               double *gradient) const {
     if (cost != NULL) {
-        VectorRef x_ref(x, numParameters());
+        VectorRef x_ref(const_cast<double *>(x), NumParameters());
         *cost = targetFunction<double>(x_ref);
     }
     if (gradient != NULL) {
-        std::vector<double> x_vec(x, x + numParameters());
+        std::vector<double> x_vec(x, x + NumParameters());
         std::vector<casadi::DM> value = gradient_(casadi::DM(x_vec));
         for (int i(0); i < value[0]->size(); ++i) {
             *(gradient + i) = value[0]->at(i);
         }
     }
+    return true;
 }
 
 CasadiEvaluator::CasadiEvaluator(const Settings &settings)

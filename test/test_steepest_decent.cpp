@@ -14,11 +14,11 @@ class MyFunction : public GradientProblem {
   MyFunction(int param_num) {
       param_num_ = param_num;
   }
-  int NumberOfParams() {
+  int NumParameters() {
       return this->param_num_;
   }
-  bool Evaluate(double *current_state, double *cost,
-                double *gradient) {
+  bool Evaluate(const double *current_state, double *cost,
+                double *gradient) const{
       const double x = current_state[0];
       const double y = current_state[1];
       if (cost != NULL) {
