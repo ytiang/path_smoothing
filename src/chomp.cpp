@@ -48,7 +48,7 @@ ChompOptimizer::ChompOptimizer(std::vector<geometry_msgs::Point> init_guses,
                                    sdf_.getResolution(),
                                    sdf_.getPosition());
     cv::Mat dis_field =
-            hmpl::eigen2cv(this->sdf_.get("distance"));
+            hmpl::eigen2cv(this->sdf_.get("gridMap"));
     cv::Mat grad_x = hmpl::eigen2cv(this->sdfGradient_.get("grad_x"));
     cv::Mat grad_y = hmpl::eigen2cv(this->sdfGradient_.get("grad_y"));
     cv::Mat kernal_x(2, 2, CV_32FC1);
@@ -70,7 +70,7 @@ ChompOptimizer::ChompOptimizer(std::vector<geometry_msgs::Point> init_guses,
 double ChompOptimizer::getObstacleCost(const Vector &xi) {
     grid_map::Position pt(xi(0), xi(1));
     if(this->sdf_.isInside(pt)) {
-        return sdf_.atPosition("distance", pt);
+        return sdf_.atPosition("gridMap", pt);
     } else {
         Eigen::Vector2d dp;
         dp(0) = fabs(pt(0)) - sdf_.getLength().x() / 2.0;

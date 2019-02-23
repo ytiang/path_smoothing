@@ -14,15 +14,18 @@ class PathSmoothing {
  public:
   struct Options {
     double heading_term_coe = 1;
-    double curvature_term_coe = 1.0;
-    double obstacle_term_coe = 1.0;
+    double curvature_term_coe = 10.0;
+    double obstacle_term_coe = 2.0;
+    grid_map::GridMap *map = NULL;
     DifferenceType type = CPPAD;
     SolverType solver = CERES_SOLVER;
+    std::string sdf_layer = "distance_cost";
   };
 
   template<class PointType>
   void smoothPath(const Options &options,
                   std::vector<PointType> *path) {
+      CHECK_GT(path->size(), 2) << "path contains less than 3 points!";
       Evaluator::Settings settings;
       settings.heading_term_coe = options.heading_term_coe;
       settings.curvature_term_coe = options.curvature_term_coe;
@@ -34,6 +37,15 @@ class PathSmoothing {
       settings.start << path->front().x, path->front().y;
       settings.end.resize(settings.degree);
       settings.end << path->back().x, path->back().y;
+      if (options.map != NULL) {
+          if (options.map->exists(options.sdf_layer)) {
+              settings.map = options.map;
+              settings.sdf_layer = options.sdf_layer;
+          } else {
+              LOG(WARNING)
+                      << "condidering obstacle term requires a grid map containing distance layer!!!";
+          }
+      }
 
       Evaluator::Vector initial_param(settings.param_num);
       for (int i(1); i < path->size() - 1; ++i) {

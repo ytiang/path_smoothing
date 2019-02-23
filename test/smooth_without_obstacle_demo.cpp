@@ -7,10 +7,12 @@
 #include <geometry_msgs/Point.h>
 #include "opt_utils/csv_writer.hpp"
 #include <ros/package.h>
+#include <ros/ros.h>
 
-int main() {
-    io::CSVReader<2> in
-            ("/home/yangt/workspace/ros_ws/catkin_ws/src/path_smoothing/path.csv");
+int main(int argc, char **argv) {
+    ros::init(argc, argv, "path_smooth_demo");
+    std::string basic_dir = ros::package::getPath("path_smoothing");
+    io::CSVReader<2> in(basic_dir + "/test/path.csv");
     in.read_header(io::ignore_extra_column, "x", "y");
     std::vector<geometry_msgs::Point> path;
 
@@ -21,6 +23,7 @@ int main() {
 
     using namespace path_smoothing;
     PathSmoothing::Options options;
+//    options.type = CASADI;
     auto t1 = hmpl::now();
     PathSmoothing smoother;
     smoother.smoothPath(options, &path);
@@ -34,7 +37,7 @@ int main() {
     for (int i(0); i < path.size(); ++i) {
         writer.newRow() << path.at(i).x << path.at(i).y;
     }
-    writer.writeToFile("/home/yangt/smooth.csv");
+    writer.writeToFile(basic_dir + "/test/smooth_result.csv");
 
 }
 

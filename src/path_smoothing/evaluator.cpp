@@ -46,12 +46,66 @@ ScalarType Evaluator::targetFunction(VectorType x) const {
         const ScalarType norm_i = sqrt(dx_i * dx_i + dy_i * dy_i) + 0.01;
         const ScalarType norm_ii = sqrt(dx_ii * dx_ii + dy_ii * dy_ii) + 0.01;
         const ScalarType theta = acos(dot / norm_i / norm_ii);
-        value = value + settings_.heading_term_coe * heading_error;
+        value = value + settings_.heading_term_coe * heading_error
         +settings_.curvature_term_coe * theta * theta / norm_i / norm_i;
+//        value = value + settings_.heading_term_coe * heading_error;
         dx_i = dx_ii;
         dy_i = dy_ii;
     }
     return value;
+}
+
+void Evaluator::addObstacleTerm(const VectorRef &x,
+                                double *cost,
+                                double *gradient) const {
+    const int size = NumParameters() / degree();
+    const auto delta = gridMap()->getResolution();
+    for (int i = 0; i < size; ++i) {
+        const double x_i = x(i * degree());
+        const double y_i = x(i * degree() + 1);
+        grid_map::Position p_i(x_i, y_i);
+        if (gridMap()->isInside(p_i)) {
+            const auto
+                    &distance_i =
+                    gridMap()->atPosition(settings_.sdf_layer, p_i);
+            *cost += settings_.obstacle_term_coe * pow(distance_i - 0, 2);
+            if (gradient != NULL) {
+                const double x_0 =
+                        std::max(x_i - delta, -gridMap()->getLength().x() / 2);
+                const double y_0 =
+                        std::max(y_i - delta, -gridMap()->getLength().y() / 2);
+                const double x_ii =
+                        std::min(x_i + delta, gridMap()->getLength().x() / 2);
+                const double y_ii =
+                        std::min(y_i + delta, gridMap()->getLength().y() / 2);
+
+                grid_map::Position p_x0(x_0, p_i(1));
+                grid_map::Position p_xii(x_ii, p_i(1));
+                grid_map::Position p_y0(p_i(0), y_0);
+                grid_map::Position p_yii(p_i(0), y_ii);
+
+                const auto
+                        &distance_x0 =
+                        gridMap()->atPosition(settings_.sdf_layer, p_x0);
+                const auto
+                        &distance_xii =
+                        gridMap()->atPosition(settings_.sdf_layer, p_xii);
+                const auto
+                        &distance_y0 =
+                        gridMap()->atPosition(settings_.sdf_layer, p_y0);
+                const auto
+                        &distance_yii =
+                        gridMap()->atPosition(settings_.sdf_layer, p_yii);
+
+                *(gradient + i * degree()) +=
+                        settings_.obstacle_term_coe * 2 * (distance_i - 0)
+                                * (distance_xii - distance_x0) / 2 / delta;
+                *(gradient + i * degree() + 1) +=
+                        settings_.obstacle_term_coe * 2 * (distance_i - 0)
+                                * (distance_yii - distance_y0) / 2 / delta;
+            }
+        }
+    }
 }
 
 CppADEvalator::CppADEvalator(const Settings &settings,
@@ -70,10 +124,8 @@ CppADEvalator::CppADEvalator(const Settings &settings,
 bool CppADEvalator::Evaluate(const double *x,
                              double *cost,
                              double *gradient) const {
-    if (cost != NULL) {
-        VectorRef x_ref(const_cast<double *>(x), NumParameters());
-        *cost = targetFunction<double>(x_ref);
-    }
+    VectorRef x_ref(const_cast<double *>(x), NumParameters());
+    *cost = targetFunction<double>(x_ref);
     if (gradient != NULL) {
         std::vector<double> var(x, x + NumParameters());
         std::vector<double> value = gradient_->Jacobian(var);
@@ -81,22 +133,26 @@ bool CppADEvalator::Evaluate(const double *x,
             *(gradient + i) = value.at(i);
         }
     }
+    if (gridMap() != NULL) {
+        addObstacleTerm(x_ref, cost, gradient);
+    }
     return true;
 }
 
 bool CasadiEvaluator::Evaluate(const double *x,
                                double *cost,
                                double *gradient) const {
-    if (cost != NULL) {
-        VectorRef x_ref(const_cast<double *>(x), NumParameters());
-        *cost = targetFunction<double>(x_ref);
-    }
+    VectorRef x_ref(const_cast<double *>(x), NumParameters());
+    *cost = targetFunction<double>(x_ref);
     if (gradient != NULL) {
         std::vector<double> x_vec(x, x + NumParameters());
         std::vector<casadi::DM> value = gradient_(casadi::DM(x_vec));
         for (int i(0); i < value[0]->size(); ++i) {
             *(gradient + i) = value[0]->at(i);
         }
+    }
+    if (gridMap() != NULL) {
+        addObstacleTerm(x_ref, cost, gradient);
     }
     return true;
 }

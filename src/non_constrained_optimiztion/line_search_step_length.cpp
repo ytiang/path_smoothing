@@ -2,7 +2,7 @@
 // Created by yangt on 18-12-21.
 //
 #include "non_constrained_optimiztion/line_search_step_length.hpp"
-#include "opt_utils/csv_writer.hpp"
+
 namespace ncopt {
 StepLengthFunction::StepLengthFunction(GradientProblem *problem)
         : problem_(problem),
@@ -238,10 +238,10 @@ WolfSearch::WolfSearch(const LineSearchOption &option,
 }
 
 bool WolfSearch::Zoom(const State &initial_state,
-                        Samples *s_lo,
-                        Samples *s_hi,
-                        double *step,
-                        Summary *summary) {
+                      Samples *s_lo,
+                      Samples *s_hi,
+                      double *step,
+                      Summary *summary) {
     // interpolate between al and ah, than find min ai
     const double &cost0 = initial_state.cost;
     const double &dird0 = initial_state.directional_derivative;
@@ -249,21 +249,22 @@ bool WolfSearch::Zoom(const State &initial_state,
     const double &c2 = options().sufficient_curvature_decrease;
     double lower_step;
     double upper_step;
+    lower_step =
+            std::min(s_lo->a, s_hi->a);// / options().min_step_decrease_rate;
+    upper_step =
+            std::max(s_lo->a, s_hi->a);// * options().min_step_decrease_rate;
     Samples current;
     while (true) {
         // choose optimal step length by approximation
-        lower_step =
-                std::min(s_lo->a, s_hi->a) / options().min_step_decrease_rate;
-        upper_step =
-                std::max(s_lo->a, s_hi->a) * options().min_step_decrease_rate;
         *step =
                 InterpolateMinimizingStepLength(initial_state, *s_lo, *s_hi,
                                                 lower_step, upper_step);
         function()->Evaluate(*step, true, &current);
-        if(fabs(s_hi->a - s_lo->a) < 1e-7) {
+        if (fabs(s_hi->a - s_lo->a) < 1e-7
+                || summary->line_search_iteration_count > 30) {
             LOG(WARNING)
-                << "Zoom Section: [" << s_lo->a << ", "
-                << s_hi->a << "] doesn't contain aviable step length!!";
+                    << "Zoom Section: [" << s_lo->a << ", "
+                    << s_hi->a << "] doesn't contain aviable step length!!";
             return false;
         }
         if (current.value > cost0 + c1 * current.a * dird0
@@ -303,7 +304,7 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
         if (current.value > cost0 + c1 * current.a * dird0 ||
                 (current.value >= previous.value &&
                         summary->line_search_iteration_count > 1)) {
-            if(!Zoom(initial_state, &previous, &current, &step, summary)) {
+            if (!Zoom(initial_state, &previous, &current, &step, summary)) {
                 return false;
             }
             break;
@@ -315,7 +316,7 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
             break;
         }
         if (current.gradient >= 0) {
-            if(!Zoom(initial_state, &current, &previous, &step, summary)) {
+            if (!Zoom(initial_state, &current, &previous, &step, summary)) {
                 return false;
             }
             break;

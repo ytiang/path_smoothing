@@ -92,6 +92,9 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
         }
         current_state.directional_derivative =
                 current_state.gradient.dot(current_state.search_direction);
+        CHECK_LT(current_state.gradient_norm, 1e10)
+            << "exit unnormal gradient at iteration: "
+            << summary->solve_iteration_count;
 
         // calculate search step length:
         // estimate initial step length. This is improtant for bad scaling

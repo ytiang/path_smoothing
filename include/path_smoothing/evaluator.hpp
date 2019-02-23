@@ -8,8 +8,9 @@
 #include <cppad/cppad.hpp>
 #include <casadi/casadi.hpp>
 #include <Eigen/Core>
-#include "non_constrained_optimiztion/gradient_problem.hpp"
 #include <ceres/ceres.h>
+#include "non_constrained_optimiztion/gradient_problem.hpp"
+#include "internal_grid_map/internal_grid_map.hpp"
 
 namespace path_smoothing {
 
@@ -24,7 +25,7 @@ enum SolverType {
 };
 
 class Evaluator
-   : public ncopt::GradientProblem, public ceres::FirstOrderFunction {
+        : public ncopt::GradientProblem, public ceres::FirstOrderFunction {
  public:
   typedef CppAD::AD<double> CppADScalar;
   typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
@@ -39,7 +40,9 @@ class Evaluator
               end(0),
               heading_term_coe(1.0),
               curvature_term_coe(1.0),
-              obstacle_term_coe(1.0) {}
+              obstacle_term_coe(1.0),
+              map(NULL) {
+    }
     int param_num;
     int degree;
     double heading_term_coe;
@@ -48,6 +51,8 @@ class Evaluator
     DifferenceType type;
     Vector start;
     Vector end;
+    grid_map::GridMap *map;
+    std::string sdf_layer;
   };
 
   template<class ScalarType>
@@ -86,12 +91,20 @@ class Evaluator
   template<class ScalarType, class VectorType>
   ScalarType targetFunction(VectorType x) const;
 
+  void addObstacleTerm(const VectorRef &x,
+                       double *cost,
+                       double *gradient) const;
+
   virtual bool Evaluate(const double *x,
                         double *cost,
                         double *gradient) const = 0;
 
   virtual inline int NumParameters() const {
       return settings_.param_num;
+  }
+
+  grid_map::GridMap *gridMap() const {
+      return settings_.map;
   }
 
  private:

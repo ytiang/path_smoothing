@@ -94,9 +94,16 @@ target_link_libraries(path_smoothing
         ${CERES_LIBRARIES}
         ${catkin_LIBRARIES})
 
-add_executable(path_smoothing_demo
-        test/test_path_smoothing.cpp)
-target_link_libraries(path_smoothing_demo
+
+add_executable(smooth_without_obstacle_demo
+        test/smooth_without_obstacle_demo.cpp)
+target_link_libraries(smooth_without_obstacle_demo
+        path_smoothing
+        ${catkin_LIBRARIES})
+
+add_executable(smooth_with_obstacle_demo
+        test/smooth_with_obstacle_demo.cpp)
+target_link_libraries(smooth_with_obstacle_demo
         path_smoothing
         ${catkin_LIBRARIES})
 
