@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8)
 project(path_smoothing)
 set(CMAKE_BUILD_TYPE "Release")
 ## Compile as C++11, supported in ROS Kinetic and newer
@@ -26,16 +26,16 @@ set(catkin_deps
 find_package(catkin REQUIRED COMPONENTS
         ${catkin_deps}
         )
-find_package(Boost COMPONENTS filesystem REQUIRED)
+find_package(Boost COMPONENTS filesystem serialization thread regex timer REQUIRED)
 find_package(OpenCV 3 REQUIRED)
 find_package(Eigen3 QUIET)
 find_package(Ceres REQUIRED)
-
 find_package(casadi REQUIRED)
+find_package(gpmp2 REQUIRED)
+find_package(GTSAM REQUIRED)
 
 find_library(GLOG glog)
 
-generate_ros_parameter_files(config/param.cfg)
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -67,30 +67,35 @@ include_directories(
         ${OpenCV_INCLUDE_DIRS}
         ${EIGEN3_INCLUDE_DIRS}
         ${CERES_INCLUDE_DIRS}
+        ${gpmp2_INCLUDE_DIR}
+        ${GTSAM_INCLUDE_DIR}
 )
 
 message("ceres include: " ${CERES_INCLUDE_DIRS})
 message("ceres library: " ${CERES_LIBRARIES})
 
-#MESSAGE(STATUS "yt:=  " ${catkin_INCLUDE_DIRS})
-
 add_library(ncopt_lib
+        include/non_constrained_optimiztion/type.hpp
+        include/non_constrained_optimiztion/gradient_problem_options.hpp
         src/non_constrained_optimiztion/line_search_direction.cpp
         src/non_constrained_optimiztion/line_search_step_length.cpp
         src/non_constrained_optimiztion/gradient_problem_solve.cpp
         src/non_constrained_optimiztion/line_search_minimizer.cpp
         src/non_constrained_optimiztion/minimize.cpp
-        src/non_constrained_optimiztion/type.cpp)
+        src/non_constrained_optimiztion/path_smoothing_type.cpp)
 target_link_libraries(ncopt_lib
         ${EIGEN3_LIBRARIES}
         ${GLOG})
 
 add_library(path_smoothing
         include/path_smoothing/path_smoothing.hpp
-        src/path_smoothing/evaluator.cpp)
+        include/path_smoothing/distance_function.hpp
+        src/path_smoothing/cg_smoothing_function.cpp
+        src/path_smoothing/path_smoothing.cpp)
 target_link_libraries(path_smoothing
         ncopt_lib
         casadi
+        gpmp2
         ${CERES_LIBRARIES}
         ${catkin_LIBRARIES})
 
@@ -100,18 +105,25 @@ add_executable(smooth_without_obstacle_demo
 target_link_libraries(smooth_without_obstacle_demo
         path_smoothing
         ${catkin_LIBRARIES})
-
+#
 add_executable(smooth_with_obstacle_demo
         test/smooth_with_obstacle_demo.cpp)
 target_link_libraries(smooth_with_obstacle_demo
         path_smoothing
         ${catkin_LIBRARIES})
+#
+add_executable(gpmp2_demo
+        test/gpmp2_smooth_demo.cpp)
+target_link_libraries(gpmp2_demo
+        ${catkin_LIBRARIES}
+        gpmp2
+        path_smoothing)
 
-#add_executable(steepest_decent_demo
-#        test/test_steepest_decent.cpp)
-#target_link_libraries(steepest_decent_demo
-#        ncopt_lib
-#        ${CERES_LIBRARIES})
+add_executable(steepest_decent_demo
+        test/test_steepest_decent.cpp)
+target_link_libraries(steepest_decent_demo
+        ncopt_lib
+        ${CERES_LIBRARIES})
 
 
 #add_library(${PROJECT_NAME}
@@ -120,10 +132,10 @@ target_link_libraries(smooth_with_obstacle_demo
 #target_link_libraries(${PROJECT_NAME}
 #  ${CERES_LIBRARIES})
 
-add_library(chomp_optimizer
-        src/chomp.cpp)
-target_link_libraries(chomp_optimizer
-        ${catkin_LIBRARIES})
+#add_library(chomp_optimizer
+#        src/chomp.cpp)
+#target_link_libraries(chomp_optimizer
+#        ${catkin_LIBRARIES})
 
 #add_executable(cg_demo
 #  src/path_smooth_demo_node.cpp)

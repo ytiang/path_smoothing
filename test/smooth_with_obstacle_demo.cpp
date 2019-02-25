@@ -23,6 +23,7 @@ class DrivableMap {
   ros::Timer timer_;
   ros::Publisher original_path_pub_;
   ros::Publisher smooth_path_pub_;
+  ros::Publisher smooth2_path_pub_;
   ros::Publisher ogm_pub_;
   ros::Publisher point_cloud_;
   hmpl::InternalGridMap map_;
@@ -63,13 +64,14 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
          ++it) {
         const auto cost = map_.maps.at(map_.dis, *it)
                 - inveres_map.maps.at(map_.dis, *it);
-        if (cost < 0.0) {
-            map_.maps.at(sdf_layer_, *it) = th - cost;
-        } else if (cost <= th) {
-            map_.maps.at(sdf_layer_, *it) = pow(cost - th, 2) / th;
-        } else {
-            map_.maps.at(sdf_layer_, *it) = 0;
-        }
+        map_.maps.at(sdf_layer_, *it) = cost;
+//        if (cost < 0.0) {
+//            map_.maps.at(sdf_layer_, *it) = th - cost;
+//        } else if (cost <= th) {
+//            map_.maps.at(sdf_layer_, *it) = pow(cost - th, 2) / th;
+//        } else {
+//            map_.maps.at(sdf_layer_, *it) = 0;
+//        }
     }
 
     io::CSVReader<2> in(base_dir_ + "/test/a_star_path.csv");
@@ -81,9 +83,12 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
 
     // init ros subscriber and publisher
     this->original_path_pub_ = this->nh_.advertise<nav_msgs::Path>(
-            "original_global_path", 1, true);
+            "original_path", 1, true);
     this->smooth_path_pub_ = this->nh_.advertise<nav_msgs::Path>(
-            "smooth_global_path", 1, true);
+            "cg_smooth_path", 1, true);
+
+    this->smooth2_path_pub_ = this->nh_.advertise<nav_msgs::Path>(
+            "gp_smooth_path", 1, true);
 
     this->ogm_pub_ = this->nh_.advertise<nav_msgs::OccupancyGrid>(
             "global_path/grid_map",
@@ -135,22 +140,46 @@ void DrivableMap::timerCb() {
     original_path_pub_.publish(original_path);
 
     using namespace path_smoothing;
-    PathSmoothing smoother;
+
+    DistanceFunction2D dis_function(map_.maps, sdf_layer_, 2.3);
     PathSmoothing::Options options;
-//    options.sdf_layer = "distance";//sdf_layer_;
-//    options.solver = SELF_SOLVER;
-    options.map = &(map_.maps);
-    std::vector<geometry_msgs::Point> path = rough_path;
+    options.function = &(dis_function);
+    //    options.solver = SELF_SOLVER;
+
+    /// conjugate-gradient smoothing:
     auto t1 = hmpl::now();
-    smoother.smoothPath(options, &path);
+    PathSmoothing *smoother =
+            PathSmoothing::createSmoother(options, rough_path);
+    smoother->smoothPath(options);
     auto t2 = hmpl::now();
-    printf("smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
+    printf("cg smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
+    std::vector<geometry_msgs::Point> path;
+    smoother->getPointPath(&path);
     for (const auto &state : path) {
         pose.pose.position.x = state.x;
         pose.pose.position.y = state.y;
         smooth_path.poses.push_back(pose);
     }
     smooth_path_pub_.publish(smooth_path);
+
+    /// Gauss Process smoothing:
+    options.smoother_type = GAUSS_PROCESS_METHOD;
+    t1 = hmpl::now();
+    PathSmoothing *smoother2 =
+            PathSmoothing::createSmoother(options, rough_path);
+    smoother2->smoothPath(options);
+    t2 = hmpl::now();
+    printf("gp smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
+    smoother2->getPointPath(&path);
+    nav_msgs::Path smooth2_path;
+    smooth2_path.header = smooth_path.header;
+    for (const auto &state : path) {
+        pose.pose.position.x = state.x;
+        pose.pose.position.y = state.y;
+        smooth2_path.poses.push_back(pose);
+    }
+    smooth2_path_pub_.publish(smooth2_path);
+
 }
 
 int main(int argc, char **argv) {

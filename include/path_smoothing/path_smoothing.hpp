@@ -4,94 +4,99 @@
 
 #ifndef PATH_SMOOTHING_PATH_SMOOTHING_HPP
 #define PATH_SMOOTHING_PATH_SMOOTHING_HPP
+#include <gtsam/slam/PriorFactor.h>
+#include <gtsam/nonlinear/GaussNewtonOptimizer.h>
+#include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
+#include <gtsam/nonlinear/DoglegOptimizer.h>
+#include <gpmp2/dynamics/VehicleDynamicsFactorPose2.h>
+#include <gpmp2/gp/GaussianProcessPriorPose2.h>
+#include <gpmp2/kinematics/Pose2MobileBaseModel.h>
 
-#include "path_smoothing/evaluator.hpp"
+#include "path_smoothing/obstacle_factor.hpp"
+#include "path_smoothing/cg_smoothing_function.hpp"
 #include "non_constrained_optimiztion/gradient_problem_solve.hpp"
+#include "geometry_msgs/Point.h"
 
 namespace path_smoothing {
 
 class PathSmoothing {
  public:
   struct Options {
-    double heading_term_coe = 1;
-    double curvature_term_coe = 10.0;
-    double obstacle_term_coe = 2.0;
-    grid_map::GridMap *map = NULL;
-    DifferenceType type = CPPAD;
-    SolverType solver = CERES_SOLVER;
-    std::string sdf_layer = "distance_cost";
+    SmootherType smoother_type = CONJUGATE_GRADIENT_METHOD;
+    // options for conjugate gradient method
+    double cg_heading_term_coe = 1;
+    double cg_curvature_term_coe = 10.0;
+    double cg_obstacle_term_coe = 2.0;
+    DifferenceType cg_difference_type = CPPAD;
+    NonlinearSolverType cg_solver = CERES_SOLVER;
+    // options for gp method
+    double gp_obs_sigma = 0.03;
+    double gp_vehicle_dynamic_sigma = 0.02;
+    double gp_dt = 0.4;
+    LeastSquaresSolver gp_solver = LEVENBERG_MARQUARDT;
+    // options for signed distance field
+    DistanceFunction2D *function = NULL;
   };
 
+  PathSmoothing(const int path_size) : path_size_(path_size) {}
+
   template<class PointType>
-  void smoothPath(const Options &options,
-                  std::vector<PointType> *path) {
-      CHECK_GT(path->size(), 2) << "path contains less than 3 points!";
-      Evaluator::Settings settings;
-      settings.heading_term_coe = options.heading_term_coe;
-      settings.curvature_term_coe = options.curvature_term_coe;
-      settings.obstacle_term_coe = options.obstacle_term_coe;
-      settings.type = options.type;
-      settings.degree = 2;
-      settings.param_num = (path->size() - 2) * settings.degree;
-      settings.start.resize(settings.degree);
-      settings.start << path->front().x, path->front().y;
-      settings.end.resize(settings.degree);
-      settings.end << path->back().x, path->back().y;
-      if (options.map != NULL) {
-          if (options.map->exists(options.sdf_layer)) {
-              settings.map = options.map;
-              settings.sdf_layer = options.sdf_layer;
-          } else {
-              LOG(WARNING)
-                      << "condidering obstacle term requires a grid map containing distance layer!!!";
-          }
-      }
+  static PathSmoothing *createSmoother(const Options &options,
+                                       const std::vector<PointType> &path);
 
-      Evaluator::Vector initial_param(settings.param_num);
-      for (int i(1); i < path->size() - 1; ++i) {
-          const int j = i - 1;
-          initial_param(j * settings.degree) = path->at(i).x;
-          initial_param(j * settings.degree + 1) = path->at(i).y;
-      }
+  template<class PointType>
+  void getPointPath(std::vector<PointType> *path);
 
-      Evaluator *smooth_function =
-              Evaluator::createEvaluator(settings, initial_param);
+  template<class PoseType>
+  void getPosePath(std::vector<PoseType> *path);
 
-      switch (options.solver) {
-          case CERES_SOLVER: {
-              ceres::GradientProblemSolver::Options option;
-              ceres::GradientProblemSolver::Summary summary;
-              ceres::GradientProblem problem(smooth_function);
-              option.nonlinear_conjugate_gradient_type = ceres::FLETCHER_REEVES;
-              option.line_search_interpolation_type = ceres::QUADRATIC;
-              option.line_search_type = ceres::WOLFE;
-              option.line_search_sufficient_function_decrease = 1e-4;
-              option.line_search_sufficient_curvature_decrease = 0.3;
-              option.min_line_search_step_contraction = 0.92;
-              option.max_line_search_step_contraction = 1e-4;
-              option.line_search_direction_type =
-                      ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
-              ceres::Solve(option, problem, initial_param.data(), &summary);
-              break;
-          }
-          case SELF_SOLVER: {
-              ncopt::GradientProblemOption solver_options;
-              ncopt::Summary summarys;
-              ncopt::GradientProblemSolver solver(smooth_function);
-              solver.Solve(initial_param.data(), solver_options, &summarys);
-              ncopt::Summary::PrintSummary(summarys);
-              break;
-          }
-      }
-
-      for (int i(1); i < path->size() - 1; ++i) {
-          const int j = i - 1;
-          path->at(i).x = initial_param(j * settings.degree);
-          path->at(i).y = initial_param(j * settings.degree + 1);
-      }
+  inline const int &pathSize() const {
+      return path_size_;
   }
+
+  virtual void smoothPath(const Options &options) = 0;
+  virtual double x(int i) const = 0;
+  virtual double y(int i) const = 0;
+
+  virtual ~PathSmoothing() {}
+
+ private:
+  const int path_size_;
+};
+
+class CgSmoothing : public PathSmoothing {
+ public:
+  template<class PointType>
+  CgSmoothing(const Options &options, const std::vector<PointType> &path);
+
+  virtual double x(int i) const;
+
+  virtual double y(int i) const;
+
+  virtual void smoothPath(const Options &options);
+ private:
+  CgSmoothingFunction::Settings settings_;
+  CgSmoothingFunction::Vector params_;
+};
+
+class GpSmoothing : public PathSmoothing {
+ public:
+  template<class PointType>
+  GpSmoothing(const Options &options, const std::vector<PointType> &path);
+
+  virtual void smoothPath(const Options &options);
+
+  virtual double x(int i) const;
+  virtual double y(int i) const;
+
+ private:
+  gtsam::Values result_;
+  gtsam::Values initial_guess;
+  gtsam::NonlinearFactorGraph graph_;
 };
 
 }
+
+#include "path_smoothing-in.hpp"
 
 #endif //PATH_SMOOTHING_PATH_SMOOTHING_HPP

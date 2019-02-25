@@ -25,11 +25,11 @@ int main(int argc, char **argv) {
     PathSmoothing::Options options;
 //    options.type = CASADI;
     auto t1 = hmpl::now();
-    PathSmoothing smoother;
-    smoother.smoothPath(options, &path);
+    PathSmoothing *smoother = PathSmoothing::createSmoother(options, &path);
+    smoother->smoothPath(options);
     auto t2 = hmpl::now();
-    printf("smooth time: %f\n",
-           hmpl::getDurationInSecs(t1, t2));
+    printf("smooth time: %f\n", hmpl::getDurationInSecs(t1, t2));
+    smoother->getPointPath(&path);
 
     // write to file:
     hmpl::CSVWriter writer(",");

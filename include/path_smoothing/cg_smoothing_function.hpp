@@ -11,20 +11,32 @@
 #include <ceres/ceres.h>
 #include "non_constrained_optimiztion/gradient_problem.hpp"
 #include "internal_grid_map/internal_grid_map.hpp"
+#include "path_smoothing/distance_function.hpp"
+//#include "path_smoothing/path_smoothing_type.hpp"
 
-namespace path_smoothing {
-
+enum SmootherType {
+  CONJUGATE_GRADIENT_METHOD,
+  GAUSS_PROCESS_METHOD,
+};
 enum DifferenceType {
   CPPAD,
   CASADI,
 };
 
-enum SolverType {
+enum NonlinearSolverType {
   SELF_SOLVER,
-  CERES_SOLVER
+  CERES_SOLVER,
 };
 
-class Evaluator
+enum LeastSquaresSolver {
+  GAUSS_NEWTON,
+  LEVENBERG_MARQUARDT,
+  DOGLEG,
+};
+
+namespace path_smoothing {
+
+class CgSmoothingFunction
         : public ncopt::GradientProblem, public ceres::FirstOrderFunction {
  public:
   typedef CppAD::AD<double> CppADScalar;
@@ -41,7 +53,7 @@ class Evaluator
               heading_term_coe(1.0),
               curvature_term_coe(1.0),
               obstacle_term_coe(1.0),
-              map(NULL) {
+              function_(NULL) {
     }
     int param_num;
     int degree;
@@ -51,7 +63,7 @@ class Evaluator
     DifferenceType type;
     Vector start;
     Vector end;
-    grid_map::GridMap *map;
+    DistanceFunction2D *function_;
     std::string sdf_layer;
   };
 
@@ -64,12 +76,12 @@ class Evaluator
     using std::vector<ScalarType>::vector;
   };
 
-  Evaluator(const Settings &settings);
+  CgSmoothingFunction(const Settings &settings);
 
-  virtual ~Evaluator() {}
+  virtual ~CgSmoothingFunction() {}
 
-  static Evaluator *createEvaluator(const Settings &settings,
-                                    const Vector &param);
+  static CgSmoothingFunction *createCgSmoothingFunction(const Settings &settings,
+                                        const Vector &param);
 
   friend inline CppADScalar cos(const CppADScalar &x) {
       return x.cos_me();
@@ -103,15 +115,15 @@ class Evaluator
       return settings_.param_num;
   }
 
-  grid_map::GridMap *gridMap() const {
-      return settings_.map;
+  DistanceFunction2D *sdf() const {
+      return settings_.function_;
   }
 
  private:
   const Settings &settings_;
 };
 
-class CppADEvalator : public Evaluator {
+class CppADEvalator : public CgSmoothingFunction {
  public:
   CppADEvalator(const Settings &settings, const Vector &param);
   virtual bool Evaluate(const double *x, double *cost, double *gradient) const;
@@ -120,9 +132,9 @@ class CppADEvalator : public Evaluator {
   CppAD::ADFun<double> *gradient_;
 };
 
-class CasadiEvaluator : public Evaluator {
+class CasadiCgSmoothingFunction : public CgSmoothingFunction {
  public:
-  CasadiEvaluator(const Settings &settings);
+  CasadiCgSmoothingFunction(const Settings &settings);
   virtual bool Evaluate(const double *x, double *cost, double *gradient) const;
  private:
   casadi::Function gradient_;

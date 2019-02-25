@@ -14,11 +14,11 @@ class MyFunction : public GradientProblem {
   MyFunction(int param_num) {
       param_num_ = param_num;
   }
-  int NumParameters() {
+  int NumParameters() const {
       return this->param_num_;
   }
   bool Evaluate(const double *current_state, double *cost,
-                double *gradient) const{
+                double *gradient) const {
       const double x = current_state[0];
       const double y = current_state[1];
       if (cost != NULL) {
@@ -59,9 +59,11 @@ double GetTimeInteral(const timeval &start, const timeval &end) {
 }
 
 int main() {
-    GradientProblemSolver solver(new MyFunction(2));
+    MyFunction yt(2);
+    GradientProblemSolver solver(&yt);
     double initial_guess[2] = {1.2, 1.2};
     GradientProblemOption options;
+    options.max_solve_iterations_num = 1000;
     Summary summary;
     timeval ts;
     gettimeofday(&ts, NULL);
