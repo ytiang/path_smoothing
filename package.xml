@@ -22,12 +22,8 @@
   <depend>roslib</depend>
   <depend>internal_grid_map</depend>
   <depend>nav_msgs</depend>
-  <depend>interactive_markers</depend>
   <depend>grid_map_visualization</depend>
   <depend>visualization_msgs</depend>
-  <depend>dynamic_reconfigure</depend>
-  <depend>rosparam_handler</depend>
-  <depend>space_explore</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

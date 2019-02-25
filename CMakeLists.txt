@@ -15,12 +15,8 @@ set(catkin_deps
         roscpp
         nav_msgs
         geometry_msgs
-        interactive_markers
         internal_grid_map
         visualization_msgs
-        dynamic_reconfigure
-        rosparam_handler
-        space_explore
         )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -71,9 +67,6 @@ include_directories(
         ${GTSAM_INCLUDE_DIR}
 )
 
-message("ceres include: " ${CERES_INCLUDE_DIRS})
-message("ceres library: " ${CERES_LIBRARIES})
-
 add_library(ncopt_lib
         include/non_constrained_optimiztion/type.hpp
         include/non_constrained_optimiztion/gradient_problem_options.hpp
@@ -101,56 +94,22 @@ target_link_libraries(path_smoothing
 
 
 add_executable(smooth_without_obstacle_demo
-        test/smooth_without_obstacle_demo.cpp)
+        demo/smooth_without_obstacle_demo.cpp)
 target_link_libraries(smooth_without_obstacle_demo
         path_smoothing
         ${catkin_LIBRARIES})
 #
 add_executable(smooth_with_obstacle_demo
-        test/smooth_with_obstacle_demo.cpp)
+        demo/smooth_with_obstacle_demo.cpp)
 target_link_libraries(smooth_with_obstacle_demo
         path_smoothing
         ${catkin_LIBRARIES})
-#
-add_executable(gpmp2_demo
-        test/gpmp2_smooth_demo.cpp)
-target_link_libraries(gpmp2_demo
-        ${catkin_LIBRARIES}
-        gpmp2
-        path_smoothing)
 
 add_executable(steepest_decent_demo
-        test/test_steepest_decent.cpp)
+        demo/test_steepest_decent.cpp)
 target_link_libraries(steepest_decent_demo
         ncopt_lib
         ${CERES_LIBRARIES})
 
-
-#add_library(${PROJECT_NAME}
-#  src/cg_solver.cpp
-#  src/path_smoothing.cpp)
-#target_link_libraries(${PROJECT_NAME}
-#  ${CERES_LIBRARIES})
-
-#add_library(chomp_optimizer
-#        src/chomp.cpp)
-#target_link_libraries(chomp_optimizer
-#        ${catkin_LIBRARIES})
-
-#add_executable(cg_demo
-#  src/path_smooth_demo_node.cpp)
-#
-#target_link_libraries(cg_demo
-#  ${catkin_LIBRARIES}
-#  ${OpenCV_LIBRARIES}
-#  ${PROJECT_NAME})
-
-#add_executable(chomp_demo
-#  src/drivable_region_node.cpp)
-
-#target_link_libraries(chomp_demo
-#  ${catkin_LIBRARIES}
-#  ${OpenCV_LIBRARIES}
-#  chomp_optimizer)
 
 

@@ -12,7 +12,7 @@
 int main(int argc, char **argv) {
     ros::init(argc, argv, "path_smooth_demo");
     std::string basic_dir = ros::package::getPath("path_smoothing");
-    io::CSVReader<2> in(basic_dir + "/test/path.csv");
+    io::CSVReader<2> in(basic_dir + "/demo/path.csv");
     in.read_header(io::ignore_extra_column, "x", "y");
     std::vector<geometry_msgs::Point> path;
 
@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     PathSmoothing::Options options;
 //    options.type = CASADI;
     auto t1 = hmpl::now();
-    PathSmoothing *smoother = PathSmoothing::createSmoother(options, &path);
+    PathSmoothing *smoother = PathSmoothing::createSmoother(options, path);
     smoother->smoothPath(options);
     auto t2 = hmpl::now();
     printf("smooth time: %f\n", hmpl::getDurationInSecs(t1, t2));
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     for (int i(0); i < path.size(); ++i) {
         writer.newRow() << path.at(i).x << path.at(i).y;
     }
-    writer.writeToFile(basic_dir + "/test/smooth_result.csv");
+    writer.writeToFile(basic_dir + "/demo/smooth_result.csv");
 
 }
 

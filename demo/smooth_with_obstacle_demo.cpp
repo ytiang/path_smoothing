@@ -35,7 +35,7 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
         : nh_(nh) {
     // init grid map
     base_dir_ = ros::package::getPath("path_smoothing");
-    cv::Mat img_src = cv::imread(base_dir_ + "/test/obstacles.png", CV_8UC1);
+    cv::Mat img_src = cv::imread(base_dir_ + "/demo/obstacles.png", CV_8UC1);
     double resolution = 0.1;  // in meter
 
     map_.initializeFromImage(img_src,
@@ -74,7 +74,7 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
 //        }
     }
 
-    io::CSVReader<2> in(base_dir_ + "/test/a_star_path.csv");
+    io::CSVReader<2> in(base_dir_ + "/demo/a_star_path.csv");
     in.read_header(io::ignore_extra_column, "x", "y");
     geometry_msgs::Point pt;
     while (in.read_row(pt.x, pt.y)) {
