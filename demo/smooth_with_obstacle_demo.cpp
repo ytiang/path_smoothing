@@ -3,22 +3,26 @@
 //
 #include <ros/ros.h>
 #include <ros/package.h>
-#include <interactive_markers/interactive_marker_server.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <dynamic_reconfigure/server.h>
 #include <nav_msgs/Path.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <grid_map_ros/GridMapRosConverter.hpp>
 #include "opt_utils/opt_utils.hpp"
 #include "path_smoothing/path_smoothing.hpp"
+#include "path_smoothing/smoothing_demoParameters.h"
 
 class DrivableMap {
  public:
   explicit DrivableMap(const ros::NodeHandle &nh,
-                       std::string node_name = "path_smoothing_node");
+                       const ros::NodeHandle &pnh);
   std::vector<geometry_msgs::Point> rough_path;
  private:
   void timerCb();
+  void reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
+                          uint32_t level);
+  path_smoothing::smoothing_demoParameters params_;
+  dynamic_reconfigure::Server<path_smoothing::smoothing_demoConfig> reconfig_;
   ros::NodeHandle nh_;
   ros::Timer timer_;
   ros::Publisher original_path_pub_;
@@ -27,12 +31,23 @@ class DrivableMap {
   ros::Publisher ogm_pub_;
   ros::Publisher point_cloud_;
   hmpl::InternalGridMap map_;
+  path_smoothing::PathSmoothing::Options options_;
+  double distance_threshold = 2.5;
   std::string base_dir_;
   std::string sdf_layer_ = "distance_cost";
 };
 
-DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
-        : nh_(nh) {
+DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
+        : nh_(nh), reconfig_(pnh), params_(pnh), options_() {
+
+    printf(">>>> distance threshold: %f\n", distance_threshold);
+    printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
+    printf(">>>> heading coe: %f\n", options_.cg_heading_term_coe);
+    printf(">>>> obstacle coe: %f\n", options_.cg_obstacle_term_coe);
+    printf(">>>> gp delta t: %f\n", options_.gp_dt);
+    printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
+    printf(">>>> gp vehicle dynamic sigma: %f\n",
+           options_.gp_vehicle_dynamic_sigma);
     // init grid map
     base_dir_ = ros::package::getPath("path_smoothing");
     cv::Mat img_src = cv::imread(base_dir_ + "/demo/obstacles.png", CV_8UC1);
@@ -103,6 +118,33 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, std::string node_name)
             this->nh_.createTimer(
                     ros::Duration(1),
                     boost::bind(&DrivableMap::timerCb, this));
+//    params_.fromParamServer();
+//    reconfig_.setCallback(boost::bind(&DrivableMap::reconfigureRequest,
+//                                      this,
+//                                      _1,
+//                                      _2));
+
+}
+
+void DrivableMap::reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
+                                     uint32_t level) {
+    params_.fromConfig(config);
+    options_.cg_curvature_term_coe = params_.cg_curvature_term_coe;
+    options_.cg_obstacle_term_coe = params_.cg_obstacle_term_coe;
+    options_.cg_heading_term_coe = params_.cg_heading_term_coe;
+    options_.gp_dt = params_.gp_dt;
+    options_.gp_obs_sigma = params_.gp_obs_sigma;
+    options_.gp_vehicle_dynamic_sigma = params_.gp_vehicle_dynamic_sigma;
+    distance_threshold = params_.distance_threshold;
+
+    printf(">>>> distance threshold: %f\n", distance_threshold);
+    printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
+    printf(">>>> heading coe: %f\n", options_.cg_heading_term_coe);
+    printf(">>>> obstacle coe: %f\n", options_.cg_obstacle_term_coe);
+    printf(">>>> gp delta t: %f\n", options_.gp_dt);
+    printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
+    printf(">>>> gp vehicle dynamic sigma: %f\n",
+           options_.gp_vehicle_dynamic_sigma);
 
 }
 
@@ -141,16 +183,16 @@ void DrivableMap::timerCb() {
 
     using namespace path_smoothing;
 
-    DistanceFunction2D dis_function(map_.maps, sdf_layer_, 2.3);
-    PathSmoothing::Options options;
-    options.function = &(dis_function);
-    //    options.solver = SELF_SOLVER;
+    DistanceFunction2D dis_function(map_.maps, sdf_layer_, distance_threshold);
+    options_.function = &(dis_function);
+    options_.cg_solver = SELF_SOLVER;
 
     /// conjugate-gradient smoothing:
+    options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
     auto t1 = hmpl::now();
     PathSmoothing *smoother =
-            PathSmoothing::createSmoother(options, rough_path);
-    smoother->smoothPath(options);
+            PathSmoothing::createSmoother(options_, rough_path);
+    smoother->smoothPath(options_);
     auto t2 = hmpl::now();
     printf("cg smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
     std::vector<geometry_msgs::Point> path;
@@ -161,13 +203,14 @@ void DrivableMap::timerCb() {
         smooth_path.poses.push_back(pose);
     }
     smooth_path_pub_.publish(smooth_path);
+    delete smoother;
 
     /// Gauss Process smoothing:
-    options.smoother_type = GAUSS_PROCESS_METHOD;
+    options_.smoother_type = GAUSS_PROCESS_METHOD;
     t1 = hmpl::now();
     PathSmoothing *smoother2 =
-            PathSmoothing::createSmoother(options, rough_path);
-    smoother2->smoothPath(options);
+            PathSmoothing::createSmoother(options_, rough_path);
+    smoother2->smoothPath(options_);
     t2 = hmpl::now();
     printf("gp smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
     smoother2->getPointPath(&path);
@@ -179,13 +222,14 @@ void DrivableMap::timerCb() {
         smooth2_path.poses.push_back(pose);
     }
     smooth2_path_pub_.publish(smooth2_path);
-
+    delete smoother2;
 }
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "path_smoothing_demo_node");
     ros::NodeHandle nh("");
-    DrivableMap drivable_region_node(nh, "path_smoothing_node");
+    ros::NodeHandle pnh("~");
+    DrivableMap drivable_region_node(nh, pnh);
     ROS_INFO("Initialized drivable region node.");
 
     ros::spin();

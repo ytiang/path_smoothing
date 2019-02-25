@@ -25,7 +25,7 @@ class PathSmoothing {
     SmootherType smoother_type = CONJUGATE_GRADIENT_METHOD;
     // options for conjugate gradient method
     double cg_heading_term_coe = 1;
-    double cg_curvature_term_coe = 10.0;
+    double cg_curvature_term_coe = 1.0;
     double cg_obstacle_term_coe = 2.0;
     DifferenceType cg_difference_type = CPPAD;
     NonlinearSolverType cg_solver = CERES_SOLVER;

@@ -63,7 +63,7 @@ void GpSmoothing::smoothPath(const Options &options) {
     switch (options.gp_solver) {
         case GAUSS_NEWTON: {
             gtsam::GaussNewtonParams params;
-            params.setVerbosity("ERROR");
+            params.setVerbosity("SILENT");
             gtsam::GaussNewtonOptimizer
                     optimizer(graph_, initial_guess, params);
             optimizer.optimize();
@@ -72,7 +72,7 @@ void GpSmoothing::smoothPath(const Options &options) {
         }
         case LEVENBERG_MARQUARDT: {
             gtsam::LevenbergMarquardtParams params;
-            params.setVerbosity("ERROR");
+            params.setVerbosity("SILENT");
             gtsam::LevenbergMarquardtOptimizer
                     optimizer(graph_, initial_guess, params);
             optimizer.optimize();
@@ -81,7 +81,7 @@ void GpSmoothing::smoothPath(const Options &options) {
         }
         case DOGLEG: {
             gtsam::DoglegParams params;
-            params.setVerbosity("ERROR");
+            params.setVerbosity("SILENT");
             gtsam::DoglegOptimizer optimizer(graph_, initial_guess, params);
             optimizer.optimize();
             result_ = optimizer.values();

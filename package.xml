@@ -24,6 +24,8 @@
   <depend>nav_msgs</depend>
   <depend>grid_map_visualization</depend>
   <depend>visualization_msgs</depend>
+  <depend>rosparam_handler</depend>
+  <depend>dynamic_reconfigure</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

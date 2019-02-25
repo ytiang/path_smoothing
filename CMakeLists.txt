@@ -17,11 +17,11 @@ set(catkin_deps
         geometry_msgs
         internal_grid_map
         visualization_msgs
-        )
+        rosparam_handler
+        dynamic_reconfigure)
 
 find_package(catkin REQUIRED COMPONENTS
-        ${catkin_deps}
-        )
+        ${catkin_deps})
 find_package(Boost COMPONENTS filesystem serialization thread regex timer REQUIRED)
 find_package(OpenCV 3 REQUIRED)
 find_package(Eigen3 QUIET)
@@ -29,8 +29,10 @@ find_package(Ceres REQUIRED)
 find_package(casadi REQUIRED)
 find_package(gpmp2 REQUIRED)
 find_package(GTSAM REQUIRED)
-
 find_library(GLOG glog)
+
+generate_ros_parameter_files(
+        cfg/smoothing_demo.params)
 
 ###################################
 ## catkin specific configuration ##
@@ -101,6 +103,7 @@ target_link_libraries(smooth_without_obstacle_demo
 #
 add_executable(smooth_with_obstacle_demo
         demo/smooth_with_obstacle_demo.cpp)
+add_dependencies(smooth_with_obstacle_demo ${catkin_EXPORTED_TARGETS} ${PROJECT_NAME}_gencfg)
 target_link_libraries(smooth_with_obstacle_demo
         path_smoothing
         ${catkin_LIBRARIES})
