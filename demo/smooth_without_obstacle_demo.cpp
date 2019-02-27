@@ -8,6 +8,7 @@
 #include "opt_utils/csv_writer.hpp"
 #include <ros/package.h>
 #include <ros/ros.h>
+#include <memory>
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "path_smooth_demo");
@@ -22,14 +23,17 @@ int main(int argc, char **argv) {
     }
 
     using namespace path_smoothing;
+
     PathSmoothing::Options options;
 //    options.type = CASADI;
     auto t1 = hmpl::now();
-    PathSmoothing *smoother = PathSmoothing::createSmoother(options, path);
+    std::unique_ptr<PathSmoothing>
+            smoother(PathSmoothing::createSmoother(options, path));
     smoother->smoothPath(options);
     auto t2 = hmpl::now();
     printf("smooth time: %f\n", hmpl::getDurationInSecs(t1, t2));
-    smoother->getPointPath(&path);
+//        smoother->getPointPath(&path);
+
 
     // write to file:
     hmpl::CSVWriter writer(",");

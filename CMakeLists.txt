@@ -23,13 +23,16 @@ set(catkin_deps
 find_package(catkin REQUIRED COMPONENTS
         ${catkin_deps})
 find_package(Boost COMPONENTS filesystem serialization thread regex timer REQUIRED)
-find_package(OpenCV 3 REQUIRED)
 find_package(Eigen3 QUIET)
-find_package(Ceres REQUIRED)
+find_package(Ceres QUIET)
 find_package(casadi REQUIRED)
-find_package(gpmp2 REQUIRED)
-find_package(GTSAM REQUIRED)
+find_package(gpmp2 QUIET)
+find_package(GTSAM QUIET)
 find_library(GLOG glog)
+
+message("gtsam found: " ${GTSAM_FOUND})
+message("gpmp found: " ${gpmp2_FOUND})
+message("ceres found: " ${Ceres_FOUND})
 
 generate_ros_parameter_files(
         cfg/smoothing_demo.params)

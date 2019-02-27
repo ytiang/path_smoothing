@@ -5,6 +5,7 @@
 #ifndef PATH_SMOOTHING_MINIMIZER_HPP
 #define PATH_SMOOTHING_MINIMIZER_HPP
 
+#include <memory>
 #include "gradient_problem_options.hpp"
 #include "gradient_problem.hpp"
 #include "eigen_typedef.hpp"

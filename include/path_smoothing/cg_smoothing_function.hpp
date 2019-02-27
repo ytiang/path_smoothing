@@ -81,7 +81,7 @@ class CgSmoothingFunction
   virtual ~CgSmoothingFunction() {}
 
   static CgSmoothingFunction *createCgSmoothingFunction(const Settings &settings,
-                                        const Vector &param);
+                                                        const Vector &param);
 
   friend inline CppADScalar cos(const CppADScalar &x) {
       return x.cos_me();
@@ -127,6 +127,10 @@ class CppADEvalator : public CgSmoothingFunction {
  public:
   CppADEvalator(const Settings &settings, const Vector &param);
   virtual bool Evaluate(const double *x, double *cost, double *gradient) const;
+
+  virtual ~CppADEvalator() {
+      delete gradient_;
+  }
 
  private:
   CppAD::ADFun<double> *gradient_;

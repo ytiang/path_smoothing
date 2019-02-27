@@ -53,10 +53,10 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
                                    Summary *summary) {
     LineSearchOption line_search_option = minimizer_option_;
     StepLengthFunction function(problem);
-    LineSearchStepLength *step_length_sercher =
-            LineSearchStepLength::Create(line_search_option, &function);
-    LineSearchDirection *direction_sercher =
-            LineSearchDirection::Create(line_search_option);
+    std::unique_ptr<LineSearchStepLength> step_length_sercher
+            (LineSearchStepLength::Create(line_search_option, &function));
+    std::unique_ptr<LineSearchDirection>
+            direction_sercher(LineSearchDirection::Create(line_search_option));
 
     State current_state(problem->NumParameters());
     State previous_state(problem->NumParameters());

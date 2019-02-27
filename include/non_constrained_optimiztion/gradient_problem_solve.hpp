@@ -6,7 +6,6 @@
 #define PATH_SMOOTHING_GRADIENT_PROBLEM_SOLVE_HPP
 
 #pragma once
-#include <memory>
 #include "gradient_problem_options.hpp"
 #include "gradient_problem.hpp"
 #include "minimizer.hpp"

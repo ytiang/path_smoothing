@@ -59,43 +59,42 @@ double GetTimeInteral(const timeval &start, const timeval &end) {
 }
 
 int main() {
-    MyFunction yt(2);
-    GradientProblemSolver solver(&yt);
     double initial_guess[2] = {1.2, 1.2};
+    timeval ts;
+    timeval te;
+    GradientProblemSolver solver(new MyFunction(2));
     GradientProblemOption options;
     options.max_solve_iterations_num = 1000;
     Summary summary;
-    timeval ts;
     gettimeofday(&ts, NULL);
     solver.Solve(initial_guess, options, &summary);
-    timeval te;
     gettimeofday(&te, NULL);
     Summary::PrintSummary(summary);
     std::cout << "prama: " << initial_guess[0] << ", " << initial_guess[1]
               << "\n";
     printf("self total time: %f\n", GetTimeInteral(ts, te));
 
-    printf("\n*********************\n");
-    ceres::GradientProblemSolver::Options option2;
-    ceres::GradientProblemSolver::Summary summary2;
-    ceres::GradientProblem problem(new MyFunction2());
-    option2.nonlinear_conjugate_gradient_type = ceres::FLETCHER_REEVES;
-    option2.line_search_interpolation_type = ceres::QUADRATIC;
-    option2.line_search_type = ceres::WOLFE;
-    option2.line_search_sufficient_function_decrease = 1e-4;
-    option2.line_search_sufficient_curvature_decrease = 0.3;
-    option2.min_line_search_step_contraction = 0.92;
-    option2.max_line_search_step_contraction = 1e-4;
-    option2.line_search_direction_type =
-            ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
-    initial_guess[0] = 1.2;
-    initial_guess[1] = 1.2;
-    gettimeofday(&ts, NULL);
-    ceres::Solve(option2, problem, initial_guess, &summary2);
-    gettimeofday(&te, NULL);
-    printf("param: %f, %f, total cost: %f\n", initial_guess[0],
-           initial_guess[1], GetTimeInteral(ts, te));
-    std::cout << summary2.FullReport() << "\n";
+//        printf("\n*********************\n");
+//        ceres::GradientProblemSolver::Options option2;
+//        ceres::GradientProblemSolver::Summary summary2;
+//        ceres::GradientProblem problem(new MyFunction2());
+//        option2.nonlinear_conjugate_gradient_type = ceres::FLETCHER_REEVES;
+//        option2.line_search_interpolation_type = ceres::QUADRATIC;
+//        option2.line_search_type = ceres::WOLFE;
+//        option2.line_search_sufficient_function_decrease = 1e-4;
+//        option2.line_search_sufficient_curvature_decrease = 0.3;
+//        option2.min_line_search_step_contraction = 0.92;
+//        option2.max_line_search_step_contraction = 1e-4;
+//        option2.line_search_direction_type =
+//                ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
+//        initial_guess[0] = 1.2;
+//        initial_guess[1] = 1.2;
+//        gettimeofday(&ts, NULL);
+//        ceres::Solve(option2, problem, initial_guess, &summary2);
+//        gettimeofday(&te, NULL);
+//        printf("param: %f, %f, total cost: %f\n", initial_guess[0],
+//               initial_guess[1], GetTimeInteral(ts, te));
+//        std::cout << summary2.FullReport() << "\n";
 #ifdef DEBUG
     for(int i(0); i < summary.step_length_vec.size(); ++i) {
         printf("a[%d]:%f, a0:%f, count:%d, f:%f, |g|:%f\n",

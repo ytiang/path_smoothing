@@ -1,6 +1,7 @@
 //
 // Created by yangt on 19-2-22.
 //
+#include <memory>
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <dynamic_reconfigure/server.h>
@@ -190,8 +191,8 @@ void DrivableMap::timerCb() {
     /// conjugate-gradient smoothing:
     options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
     auto t1 = hmpl::now();
-    PathSmoothing *smoother =
-            PathSmoothing::createSmoother(options_, rough_path);
+    std::unique_ptr<PathSmoothing>
+            smoother(PathSmoothing::createSmoother(options_, rough_path));
     smoother->smoothPath(options_);
     auto t2 = hmpl::now();
     printf("cg smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
@@ -203,13 +204,12 @@ void DrivableMap::timerCb() {
         smooth_path.poses.push_back(pose);
     }
     smooth_path_pub_.publish(smooth_path);
-    delete smoother;
 
     /// Gauss Process smoothing:
     options_.smoother_type = GAUSS_PROCESS_METHOD;
     t1 = hmpl::now();
-    PathSmoothing *smoother2 =
-            PathSmoothing::createSmoother(options_, rough_path);
+    std::unique_ptr<PathSmoothing>
+            smoother2(PathSmoothing::createSmoother(options_, rough_path));
     smoother2->smoothPath(options_);
     t2 = hmpl::now();
     printf("gp smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
@@ -222,7 +222,6 @@ void DrivableMap::timerCb() {
         smooth2_path.poses.push_back(pose);
     }
     smooth2_path_pub_.publish(smooth2_path);
-    delete smoother2;
 }
 
 int main(int argc, char **argv) {
