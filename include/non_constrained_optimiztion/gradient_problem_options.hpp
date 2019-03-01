@@ -16,7 +16,7 @@ class BasicOption {
       function_tolerance = 1e-6;
       gradient_norm_tolerance = 1e-10;
       max_solve_iterations_num = 70;
-      step_norm_torelance_coe = 1e-6;
+      step_norm_torelance_coe = 1e-8;
   }
   MinimizerType minimizer_type;
   double function_tolerance;

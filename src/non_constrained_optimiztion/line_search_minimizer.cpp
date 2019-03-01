@@ -29,12 +29,14 @@ double LineSearchMinimizer::GetInitialStepLength(const State &previous_state,
 //                        previous_state.directional_derivative /
 //                        current_state.directional_derivative;
                 step_length =
-                        2 * (current_state.cost - previous_state.cost)
+                        2.0 * (current_state.cost - previous_state.cost)
                                 / current_state.directional_derivative;
 //                state->step_length = std::min(10*state->step_length,
 //                                              1.0/current_state.gradient_norm);
             } else {
                 step_length = 1.0 / current_state.gradient_norm;
+//                step_length =
+//                        1.0 / current_state.gradient.lpNorm<Eigen::Infinity>();
             }
             step_length = std::min(step_length, 1.0);
             break;
@@ -78,15 +80,8 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
         if (summary->solve_iteration_count == 0) {
             current_state.search_direction = -current_state.gradient;
         } else {
-            // restart strategy
-            if (previous_state.gradient.dot(current_state.gradient) /
-                    pow(current_state.gradient_norm, 2) < 0.1) {
-                current_state.search_direction = -current_state.gradient;
-            } else {
-                direction_sercher->
-                        NextDirection(previous_state, current_state,
-                                      &(current_state.search_direction));
-            }
+            direction_sercher->
+                    NextDirection(previous_state, current_state,
         }
         current_state.directional_derivative =
                 current_state.gradient.dot(current_state.search_direction);

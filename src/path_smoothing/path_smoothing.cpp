@@ -26,7 +26,9 @@ void CgSmoothing::smoothPath(const Options &options) {
             option.max_line_search_step_contraction = 1e-4;
             option.line_search_direction_type =
                     ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
+            option.max_num_iterations = 100;
             ceres::Solve(option, problem, params_.data(), &summary);
+            std::cout << summary.FullReport();
             break;
         }
         case SELF_SOLVER: {

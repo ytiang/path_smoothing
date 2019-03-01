@@ -24,6 +24,11 @@ NonConjugateDirection(const NonlinearConjugateGradientType type)
 void NonConjugateDirection::NextDirection(
         const LineSearchMinimizer::State &previous,
         const LineSearchMinimizer::State &current, Vector *search_direction) {
+//    if (previous.gradient.dot(current.gradient) /
+//            pow(current.gradient_norm, 2) < 0.1) {
+////        LOG(WARNING) << "Restarting non-linear conjugate gradients";
+//        *search_direction = -current.gradient;
+//    }
     double beta = 0.0;
     switch (type_) {
         case FLETCHER_REEVES: {
@@ -57,9 +62,11 @@ void NonConjugateDirection::NextDirection(
         }
     }
     *search_direction = -current.gradient + beta * previous.search_direction;
-//    if (current.gradient.dot(*search_direction) > -1e-6) {
-//        *search_direction = -current.gradient;
-//    }
+
+    if (current.gradient.dot(*search_direction) > -1e-6) {
+        *search_direction = -current.gradient;
+//        LOG(WARNING) << "Restarting non-linear conjugate gradients: ";
+    }
 }
 
 }
