@@ -19,10 +19,10 @@ namespace ncopt {
 class Summary {
  public:
   Summary() {
-      cost_function_value = std::numeric_limits<double>::infinity();
+      final_cost = std::numeric_limits<double>::infinity();
       cost_function_decrement = std::numeric_limits<double>::infinity();
-      gradient_norm_value = std::numeric_limits<double>::infinity();
-      gradien_norm_decrement = std::numeric_limits<double>::infinity();
+      final_gradient_norm = std::numeric_limits<double>::infinity();
+      step_norm = std::numeric_limits<double>::infinity();
       solve_iteration_count = 0;
       line_search_iteration_count = 0;
       line_search_direction_type = STEEPEST_DESCENT;
@@ -33,10 +33,12 @@ class Summary {
   std::string message;
   double step;
   double initial_step;
-  double cost_function_value;
+  double initial_cost;
+  double final_cost;
   double cost_function_decrement;
-  double gradient_norm_value;
-  double gradien_norm_decrement;
+  double initial_gradient_norm;
+  double final_gradient_norm;
+  double step_norm;
   int solve_iteration_count;
   int line_search_iteration_count;
   int search_step_fail_count;
@@ -56,18 +58,20 @@ class Summary {
                      "  line search type: %s\n"
                      "  step length type: %s\n"
                      "  Iterations: %d\n"
-                     "  Cost: %f\n"
-                     "  Cost change: %f\n"
-                     "  Gradient norm: %f\n"
-                     "  Gradient norm change: %f\n"
+                     "  Initial Cost: %.12f\n"
+                     "  Final Cost: %.12f\n"
+                     "  Initial Gradient norm: %.12f\n"
+                     "  Final Gradient norm: %.12f\n"
+                     "  Step norm: %.12f\n"
                      "  Termination type: %s\n",
              LineSearchDirectionTypeToString(summary.line_search_direction_type),
              LIneSearchStepTypeToString(summary.step_length_type),
              summary.solve_iteration_count,
-             summary.cost_function_value,
-             summary.cost_function_decrement,
-             summary.gradient_norm_value,
-             summary.gradien_norm_decrement,
+             summary.initial_cost,
+             summary.final_cost,
+             summary.initial_gradient_norm,
+             summary.final_gradient_norm,
+             summary.step_norm,
              TerminationTypeToString(summary.termination_type));
   }
 };

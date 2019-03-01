@@ -191,10 +191,6 @@ bool ArimjoSearch::DoSearch(const State &initial_state,
     }
     function()->Evaluate(summary->initial_step, is_evaluate_gradient, &current);
 
-#ifdef DEBUG
-    summary->initial_step_length_vec.push_back(summary->initial_step);
-#endif
-
     while (true) {
         // sufficient decrease condition:
         if (current.value < initial_state.cost + options().sufficient_decrease
@@ -222,12 +218,6 @@ bool ArimjoSearch::DoSearch(const State &initial_state,
         summary->line_search_iteration_count++;
     }
     summary->step = current.a;
-#ifdef DEBUG
-    summary->step_length_vec.push_back(summary->step);
-    summary->line_search_iterations_vec.push_back(summary->line_search_iteration_count);
-    summary->cost_vec.push_back(current.value);
-    summary->gradient_norm_vec.push_back(current.vector_gradient.norm());
-#endif
     return true;
 }
 
@@ -260,8 +250,8 @@ bool WolfSearch::Zoom(const State &initial_state,
                 InterpolateMinimizingStepLength(initial_state, *s_lo, *s_hi,
                                                 lower_step, upper_step);
         function()->Evaluate(*step, true, &current);
-        if (fabs(s_hi->a - s_lo->a) < 1e-7
-                || summary->line_search_iteration_count > 30) {
+        if (fabs(s_hi->a - s_lo->a) < 1e-10
+                || summary->line_search_iteration_count > 60) {
             LOG(WARNING)
                     << "Zoom Section: [" << s_lo->a << ", "
                     << s_hi->a << "] doesn't contain aviable step length!!";

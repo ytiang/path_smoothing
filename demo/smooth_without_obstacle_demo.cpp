@@ -25,6 +25,7 @@ int main(int argc, char **argv) {
     using namespace path_smoothing;
 
     PathSmoothing::Options options;
+    options.cg_solver = SELF_SOLVER;
 //    options.type = CASADI;
     auto t1 = hmpl::now();
     std::unique_ptr<PathSmoothing>
@@ -32,7 +33,7 @@ int main(int argc, char **argv) {
     smoother->smoothPath(options);
     auto t2 = hmpl::now();
     printf("smooth time: %f\n", hmpl::getDurationInSecs(t1, t2));
-//        smoother->getPointPath(&path);
+    smoother->getPointPath(&path);
 
 
     // write to file:

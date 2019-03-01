@@ -14,12 +14,6 @@ LineSearchMinimizer::LineSearchMinimizer(
 
 }
 
-void LineSearchMinimizer::GetSummaryFromState(const State &state,
-                                              Summary *summary) const {
-    summary->gradient_norm_value = state.gradient_norm;
-    summary->cost_function_value = state.cost;
-}
-
 double LineSearchMinimizer::GetInitialStepLength(const State &previous_state,
                                                  const State &current_state,
                                                  const Summary &summary) const {
@@ -31,7 +25,7 @@ double LineSearchMinimizer::GetInitialStepLength(const State &previous_state,
         case STEEPEST_DESCENT:
         case NONLINEAR_CONJUGATE_GRADIENT:
             if (summary.solve_iteration_count > 0) {
-//                state->step_length = previous_state.step_length *
+//                step_length = previous_state.step_length *
 //                        previous_state.directional_derivative /
 //                        current_state.directional_derivative;
                 step_length =
@@ -58,16 +52,20 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
     std::unique_ptr<LineSearchDirection>
             direction_sercher(LineSearchDirection::Create(line_search_option));
 
+    VectorRef param(param_ptr, problem->NumParameters());
+
     State current_state(problem->NumParameters());
     State previous_state(problem->NumParameters());
     problem->Evaluate(param_ptr, &(current_state.cost),
                       current_state.gradient.data());
     current_state.gradient_norm = current_state.gradient.norm();
+    current_state.x_norm = param.norm();
     previous_state.step_length = -1;
 
-    VectorRef param(param_ptr, problem->NumParameters());
     summary->solve_iteration_count = 0;
     summary->search_step_fail_count = 0;
+    summary->initial_cost = current_state.cost;
+    summary->initial_gradient_norm = current_state.gradient_norm;
 
     while (summary->solve_iteration_count <
             minimizer_option_.max_solve_iterations_num) {
@@ -115,17 +113,22 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
                 return false;
             }
         }
-
+        current_state.step_length = summary->step;
+#ifdef DEBUG
+        summary->step_length_vec.push_back(summary->step);
+        summary->cost_vec.push_back(current_state.cost);
+        summary->gradient_norm_vec.push_back(current_state.gradient_norm);
+#endif
         previous_state = current_state;
         // update current state:
-        current_state.step_length = summary->step;
         param = param
                 + current_state.step_length * current_state.search_direction;
         problem->Evaluate(param.data(), &(current_state.cost),
                           current_state.gradient.data());
         current_state.gradient_norm = current_state.gradient.norm();
-        summary->cost_function_value = current_state.cost;
-        summary->gradient_norm_value = current_state.gradient_norm;
+        current_state.x_norm = param.norm();
+        summary->final_cost = current_state.cost;
+        summary->final_gradient_norm = current_state.gradient_norm;
         summary->solve_iteration_count++;
     }
     summary->termination_type = ITERATION_COUNT_LIMITED;

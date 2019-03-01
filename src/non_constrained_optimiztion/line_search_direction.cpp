@@ -57,6 +57,9 @@ void NonConjugateDirection::NextDirection(
         }
     }
     *search_direction = -current.gradient + beta * previous.search_direction;
+//    if (current.gradient.dot(*search_direction) > -1e-6) {
+//        *search_direction = -current.gradient;
+//    }
 }
 
 }

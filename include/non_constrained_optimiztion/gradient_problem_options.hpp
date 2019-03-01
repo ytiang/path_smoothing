@@ -14,14 +14,15 @@ class BasicOption {
   BasicOption() {
       minimizer_type = LINE_SEARCH;
       function_tolerance = 1e-6;
-      gradient_norm_tolerance = 1e-6;
-      gradine_norm_threshold = 1e-3;
+      gradient_norm_tolerance = 1e-10;
       max_solve_iterations_num = 70;
+      step_norm_torelance_coe = 1e-6;
   }
   MinimizerType minimizer_type;
   double function_tolerance;
   double gradient_norm_tolerance;
   double gradine_norm_threshold;
+  double step_norm_torelance_coe;
   int max_solve_iterations_num;
 };
 

@@ -9,7 +9,7 @@ namespace ncopt {
 const char *TerminationTypeToString(const TerminationType &type) {
     switch (type) {
         CASESTR(GRADIENT_NORM_CONVERGENCE);
-        CASESTR(GRADIENT_NORM_DECREMENT_CONVERGENCE);
+        CASESTR(STEP_NORM_CONVERGENCE);
         CASESTR(COST_DECREMENT_CONVERGENCE);
         CASESTR(NO_CONVERGENCE);
         CASESTR(FAILURE);

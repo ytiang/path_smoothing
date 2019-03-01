@@ -64,7 +64,7 @@ int main() {
     timeval te;
     GradientProblemSolver solver(new MyFunction(2));
     GradientProblemOption options;
-    options.max_solve_iterations_num = 1000;
+    options.max_solve_iterations_num = 10000;
     Summary summary;
     gettimeofday(&ts, NULL);
     solver.Solve(initial_guess, options, &summary);
@@ -74,36 +74,47 @@ int main() {
               << "\n";
     printf("self total time: %f\n", GetTimeInteral(ts, te));
 
-//        printf("\n*********************\n");
-//        ceres::GradientProblemSolver::Options option2;
-//        ceres::GradientProblemSolver::Summary summary2;
-//        ceres::GradientProblem problem(new MyFunction2());
-//        option2.nonlinear_conjugate_gradient_type = ceres::FLETCHER_REEVES;
-//        option2.line_search_interpolation_type = ceres::QUADRATIC;
-//        option2.line_search_type = ceres::WOLFE;
-//        option2.line_search_sufficient_function_decrease = 1e-4;
-//        option2.line_search_sufficient_curvature_decrease = 0.3;
-//        option2.min_line_search_step_contraction = 0.92;
-//        option2.max_line_search_step_contraction = 1e-4;
-//        option2.line_search_direction_type =
-//                ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
-//        initial_guess[0] = 1.2;
-//        initial_guess[1] = 1.2;
-//        gettimeofday(&ts, NULL);
-//        ceres::Solve(option2, problem, initial_guess, &summary2);
-//        gettimeofday(&te, NULL);
-//        printf("param: %f, %f, total cost: %f\n", initial_guess[0],
-//               initial_guess[1], GetTimeInteral(ts, te));
-//        std::cout << summary2.FullReport() << "\n";
+    printf("\n*********************\n");
+    ceres::GradientProblemSolver::Options option2;
+    ceres::GradientProblemSolver::Summary summary2;
+    ceres::GradientProblem problem(new MyFunction2());
+    option2.nonlinear_conjugate_gradient_type = ceres::FLETCHER_REEVES;
+    option2.line_search_interpolation_type = ceres::QUADRATIC;
+    option2.line_search_type = ceres::WOLFE;
+    option2.line_search_sufficient_function_decrease = 1e-4;
+    option2.line_search_sufficient_curvature_decrease = 0.3;
+    option2.min_line_search_step_contraction = 0.92;
+    option2.max_line_search_step_contraction = 1e-4;
+    option2.line_search_direction_type =
+            ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
+    initial_guess[0] = 1.2;
+    initial_guess[1] = 1.2;
+    gettimeofday(&ts, NULL);
+    ceres::Solve(option2, problem, initial_guess, &summary2);
+    gettimeofday(&te, NULL);
+    printf("param: %f, %f, total cost: %f\n", initial_guess[0],
+           initial_guess[1], GetTimeInteral(ts, te));
+    std::cout << summary2.FullReport() << "\n";
 #ifdef DEBUG
-    for(int i(0); i < summary.step_length_vec.size(); ++i) {
-        printf("a[%d]:%f, a0:%f, count:%d, f:%f, |g|:%f\n",
-               i,
-               summary.step_length_vec.at(i),
-               summary.initial_step_length_vec.at(i),
-               summary.line_search_iterations_vec.at(i),
-               summary.cost_vec.at(i),
-               summary.gradient_norm_vec.at(i));
+    printf("\n\n******** step size: \n");
+    for (int i = 0; i < summary.cost_vec.size(); ++i) {
+        if(i<summary2.iterations.size()) {
+            printf("[%d]: ceres a: %7f, f: %7f, |g|: %7f; self: a: %7f, f: %7f, |g|: %7f\n",
+                   summary2.iterations.at(i).step_size,
+                   summary2.iterations.at(i).cost,
+                   summary2.iterations.at(i).gradient_norm,
+                   summary.step_length_vec.at(i),
+                   summary.cost_vec.at(i),
+                   summary.gradient_norm_vec.at(i));
+        } else {
+            printf("[%d]: ceres a: %7f, f: %7f, |g|: %7f; self: a: %7f, f: %7f, |g|: %7f\n",
+                   0.0,
+                   0.0,
+                   0.0,
+                   summary.step_length_vec.at(i),
+                   summary.cost_vec.at(i),
+                   summary.gradient_norm_vec.at(i));
+        }
     }
 #endif
     return 0;

@@ -16,6 +16,7 @@ void CgSmoothing::smoothPath(const Options &options) {
             ceres::GradientProblemSolver::Options option;
             ceres::GradientProblemSolver::Summary summary;
             ceres::GradientProblem problem(smooth_function);
+            option.logging_type = ceres::SILENT;
             option.nonlinear_conjugate_gradient_type = ceres::FLETCHER_REEVES;
             option.line_search_interpolation_type = ceres::QUADRATIC;
             option.line_search_type = ceres::WOLFE;

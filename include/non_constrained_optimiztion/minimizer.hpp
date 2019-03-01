@@ -15,30 +15,32 @@ namespace ncopt {
 
 class Minimizer {
  public:
-    struct State {
-        State(int num_effective_parameters)
-                : cost(0.0),
-                  gradient(num_effective_parameters),
-                  gradient_norm(0.0),
-                  search_direction(num_effective_parameters),
-                  directional_derivative(0.0),
-                  step_length(0.0) {
-        }
+  struct State {
+    State(int num_effective_parameters)
+            : cost(0.0),
+              gradient(num_effective_parameters),
+              gradient_norm(0.0),
+              search_direction(num_effective_parameters),
+              directional_derivative(0.0),
+              step_length(0.0),
+              x_norm(0.0) {
+    }
 
-        double cost;
-        Vector gradient;
-        double gradient_norm;
-        Vector search_direction;
-        double directional_derivative;
-        double step_length;
-    };
+    double cost;
+    Vector gradient;
+    double gradient_norm;
+    Vector search_direction;
+    double directional_derivative;
+    double step_length;
+    double x_norm;
+  };
 
-    static Minimizer * Create(const GradientProblemOption &options);
+  static Minimizer *Create(const GradientProblemOption &options);
 
-    virtual bool Minimize(double *param_ptr, GradientProblem *problem,
-                          Summary *summary) = 0;
+  virtual bool Minimize(double *param_ptr, GradientProblem *problem,
+                        Summary *summary) = 0;
 
-    virtual ~Minimizer() {}
+  virtual ~Minimizer() {}
 };
 
 }

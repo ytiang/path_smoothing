@@ -279,7 +279,7 @@ enum TerminationType {
 
   GRADIENT_NORM_CONVERGENCE,
 
-  GRADIENT_NORM_DECREMENT_CONVERGENCE,
+  STEP_NORM_CONVERGENCE,
 
   // The solver ran for maximum number of iterations or maximum amount
   // of time specified by the user, but none of the convergence
