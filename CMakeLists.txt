@@ -23,16 +23,16 @@ set(catkin_deps
 find_package(catkin REQUIRED COMPONENTS
         ${catkin_deps})
 find_package(Boost COMPONENTS filesystem serialization thread regex timer REQUIRED)
-find_package(Eigen3 QUIET)
 find_package(Ceres QUIET)
 find_package(casadi REQUIRED)
 find_package(gpmp2 QUIET)
 find_package(GTSAM QUIET)
 find_library(GLOG glog)
 
-message("gtsam found: " ${GTSAM_FOUND})
-message("gpmp found: " ${gpmp2_FOUND})
-message("ceres found: " ${Ceres_FOUND})
+if (${GTSAM_FOUND} AND ${gpmp2_FOUND})
+  add_definitions(-DGPMP2_SMOOTHING_ENABLE)
+  message("enable gpmp2 smoothing method")
+endif ()
 
 generate_ros_parameter_files(
         cfg/smoothing_demo.params)

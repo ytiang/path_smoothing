@@ -80,8 +80,10 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
         if (summary->solve_iteration_count == 0) {
             current_state.search_direction = -current_state.gradient;
         } else {
+            // restart strategy
             direction_sercher->
                     NextDirection(previous_state, current_state,
+                                  &(current_state.search_direction));
         }
         current_state.directional_derivative =
                 current_state.gradient.dot(current_state.search_direction);

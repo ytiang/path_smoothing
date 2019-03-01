@@ -15,7 +15,12 @@ PathSmoothing *PathSmoothing::createSmoother(const Options &options,
             return new CgSmoothing(options, path);
         }
         case GAUSS_PROCESS_METHOD: {
+#ifdef GPMP2_SMOOTHING_ENABLE
             return new GpSmoothing(options, path);
+#else
+            LOG(ERROR) << "gpmp2 smoothing is not supported unless you have installed gtsam and gpmp2 libraries!!";
+            return new CgSmoothing(options, path);
+#endif
         }
     }
 }
@@ -65,6 +70,8 @@ CgSmoothing::CgSmoothing(const Options &options,
         params_(j * settings_.degree + 1) = path.at(i).y;
     }
 }
+
+#ifdef GPMP2_SMOOTHING_ENABLE
 template<class PointType>
 GpSmoothing::GpSmoothing(const Options &options,
                          const std::vector<PointType> &path)
@@ -140,6 +147,7 @@ GpSmoothing::GpSmoothing(const Options &options,
         }
     }
 }
+#endif
 
 }
 

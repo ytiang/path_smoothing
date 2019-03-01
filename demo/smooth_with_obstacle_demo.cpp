@@ -120,10 +120,10 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
                     ros::Duration(1),
                     boost::bind(&DrivableMap::timerCb, this));
 //    params_.fromParamServer();
-//    reconfig_.setCallback(boost::bind(&DrivableMap::reconfigureRequest,
-//                                      this,
-//                                      _1,
-//                                      _2));
+    reconfig_.setCallback(boost::bind(&DrivableMap::reconfigureRequest,
+                                      this,
+                                      _1,
+                                      _2));
 
 }
 
@@ -186,7 +186,7 @@ void DrivableMap::timerCb() {
 
     DistanceFunction2D dis_function(map_.maps, sdf_layer_, distance_threshold);
     options_.function = &(dis_function);
-    options_.cg_solver = SELF_SOLVER;
+//    options_.cg_solver = SELF_SOLVER;
 
     /// conjugate-gradient smoothing:
     options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
@@ -206,6 +206,7 @@ void DrivableMap::timerCb() {
     smooth_path_pub_.publish(smooth_path);
 
     /// Gauss Process smoothing:
+#ifdef GPMP2_SMOOTHING_ENABLE
     options_.smoother_type = GAUSS_PROCESS_METHOD;
     t1 = hmpl::now();
     std::unique_ptr<PathSmoothing>
@@ -222,6 +223,7 @@ void DrivableMap::timerCb() {
         smooth2_path.poses.push_back(pose);
     }
     smooth2_path_pub_.publish(smooth2_path);
+#endif
 }
 
 int main(int argc, char **argv) {

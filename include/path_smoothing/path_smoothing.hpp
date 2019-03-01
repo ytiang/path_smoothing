@@ -4,6 +4,7 @@
 
 #ifndef PATH_SMOOTHING_PATH_SMOOTHING_HPP
 #define PATH_SMOOTHING_PATH_SMOOTHING_HPP
+#ifdef GPMP2_SMOOTHING_ENABLE
 #include <gtsam/slam/PriorFactor.h>
 #include <gtsam/nonlinear/GaussNewtonOptimizer.h>
 #include <gtsam/nonlinear/LevenbergMarquardtOptimizer.h>
@@ -11,8 +12,9 @@
 #include <gpmp2/dynamics/VehicleDynamicsFactorPose2.h>
 #include <gpmp2/gp/GaussianProcessPriorPose2.h>
 #include <gpmp2/kinematics/Pose2MobileBaseModel.h>
-
 #include "path_smoothing/obstacle_factor.hpp"
+#endif
+
 #include "path_smoothing/cg_smoothing_function.hpp"
 #include "non_constrained_optimiztion/gradient_problem_solve.hpp"
 #include "geometry_msgs/Point.h"
@@ -34,6 +36,7 @@ class PathSmoothing {
     double gp_vehicle_dynamic_sigma = 0.02;
     double gp_dt = 0.4;
     LeastSquaresSolver gp_solver = LEVENBERG_MARQUARDT;
+
     // options for signed distance field
     DistanceFunction2D *function = NULL;
   };
@@ -79,6 +82,7 @@ class CgSmoothing : public PathSmoothing {
   CgSmoothingFunction::Vector params_;
 };
 
+#ifdef GPMP2_SMOOTHING_ENABLE
 class GpSmoothing : public PathSmoothing {
  public:
   template<class PointType>
@@ -94,6 +98,7 @@ class GpSmoothing : public PathSmoothing {
   gtsam::Values initial_guess;
   gtsam::NonlinearFactorGraph graph_;
 };
+#endif
 
 }
 
