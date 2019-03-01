@@ -5,15 +5,16 @@
 #include <glog/logging.h>
 namespace path_smoothing {
 
-CgSmoothingFunction::CgSmoothingFunction(const Settings &settings) : settings_(settings) {
+CgSmoothingFunction::CgSmoothingFunction(const Settings &settings) : settings_(
+        settings) {
 
 }
 
 //template<class PointType>
 CgSmoothingFunction *CgSmoothingFunction::createCgSmoothingFunction(const Settings &settings,
-                                            const Vector &param) {
+                                                                    const Vector &param) {
     CHECK_EQ(settings.param_num, param.size())
-            << "setting parameters' number is different from the size of input param!!!";
+        << "setting parameters' number is different from the size of input param!!!";
     switch (settings.type) {
         case CPPAD:return new CppADEvalator(settings, param);
         case CASADI: return new CasadiCgSmoothingFunction(settings);
@@ -25,7 +26,7 @@ ScalarType CgSmoothingFunction::targetFunction(VectorType x) const {
     CHECK_GT(degree(), 0) << "invalid degree information :"
                           << degree();
     CHECK_GT(settings_.param_num, degree())
-            << "invalid parameter numbers " << settings_.param_num;
+        << "invalid parameter numbers " << settings_.param_num;
     const int size = settings_.param_num / degree();
     ScalarType dx_i, dy_i, dx_ii, dy_ii;
     ScalarType heading_error;
@@ -57,15 +58,20 @@ ScalarType CgSmoothingFunction::targetFunction(VectorType x) const {
 }
 
 void CgSmoothingFunction::addObstacleTerm(const VectorRef &x,
-                                  double *cost,
-                                  double *gradient) const {
+                                          double *cost,
+                                          double *gradient) const {
     const int size = NumParameters() / degree();
+    double obs_gradient[2];
     for (int i = 0; i < size; ++i) {
         const double x_i = x(i * degree());
         const double y_i = x(i * degree() + 1);
-        *cost += sdf()->cost(x_i, y_i);
+        *cost += settings_.obstacle_term_coe * sdf()->cost(x_i, y_i);
         if (gradient != NULL) {
-            sdf()->gradient(x_i, y_i, gradient);
+            sdf()->gradient(x_i, y_i, obs_gradient);
+            *(gradient + i * degree()) +=
+                    settings_.obstacle_term_coe * obs_gradient[0];
+            *(gradient + i * degree() + 1) +=
+                    settings_.obstacle_term_coe * obs_gradient[1];
         }
     }
 }
@@ -102,8 +108,8 @@ bool CppADEvalator::Evaluate(const double *x,
 }
 
 bool CasadiCgSmoothingFunction::Evaluate(const double *x,
-                                 double *cost,
-                                 double *gradient) const {
+                                         double *cost,
+                                         double *gradient) const {
     VectorRef x_ref(const_cast<double *>(x), NumParameters());
     *cost = targetFunction<double>(x_ref);
     if (gradient != NULL) {
