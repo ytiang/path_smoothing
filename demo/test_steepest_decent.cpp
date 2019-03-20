@@ -99,10 +99,11 @@ int main() {
     printf("\n\n******** step size: \n");
     for (int i = 0; i < summary.cost_vec.size(); ++i) {
         if(i<summary2.iterations.size()) {
-            printf("[%d]: ceres a: %7f, f: %7f, |g|: %7f; self: a: %7f, f: %7f, |g|: %7f\n",
+            printf("[%d]: ceres a: %7f, f: %7f, |g|: %7f, max|g|: %7f\n[%d]: self  a: %7f, f: %7f, |g|: %7f, max|g|:%7f\n",
                    summary2.iterations.at(i).step_size,
                    summary2.iterations.at(i).cost,
                    summary2.iterations.at(i).gradient_norm,
+                   summary2.iterations.at(i).gradient_max_norm,
                    summary.step_length_vec.at(i),
                    summary.cost_vec.at(i),
                    summary.gradient_norm_vec.at(i));

@@ -34,12 +34,12 @@ class LineSearchMinimizer : public Minimizer {
       summary->cost_function_decrement =
               previous_state.cost - current_state.cost;
       summary->step_norm = previous_state.search_direction.norm()
-              * previous_state.step_length;
+              * current_state.step_length;
       const double step_norm_tolerance =
               minimizer_option_.step_norm_torelance_coe * (previous_state.x_norm
                       + minimizer_option_.step_norm_torelance_coe);
 
-      if (current_state.gradient_norm <
+      if (current_state.gradient_max_norm <
               minimizer_option_.gradient_norm_tolerance) {
           summary->termination_type = GRADIENT_NORM_CONVERGENCE;
           return true;

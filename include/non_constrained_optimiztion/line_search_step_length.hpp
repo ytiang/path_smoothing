@@ -73,9 +73,9 @@ class LineSearchStepLength {
   static LineSearchStepLength *Create(const LineSearchOption &options,
                                       StepLengthFunction *function);
 
-  double InterpolateMinimizingStepLength(const State &initial_state,
-                                         const Samples &sample0,
+  double InterpolateMinimizingStepLength(const Samples &sample0,
                                          const Samples &sample1,
+                                         const Samples &sample2,
                                          const double lower_step,
                                          const double upper_step) const;
 

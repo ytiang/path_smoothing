@@ -47,7 +47,7 @@ void NonConjugateDirection::NextDirection(
             break;
         }
         case FR_PR: {
-            double beta_fr = current.gradient_norm / previous.gradient_norm;
+            double beta_fr = pow(current.gradient_norm, 2) / pow(previous.gradient_norm, 2);
             double beta_pr =
                     current.gradient.dot(current.gradient - previous.gradient)
                             / std::pow(previous.gradient_norm, 2);

@@ -50,7 +50,12 @@ class Summary {
   std::vector<double> initial_step_length_vec;
   std::vector<int> line_search_iterations_vec;
   std::vector<double> cost_vec;
+  std::vector<double> dir_norm_vec;
   std::vector<double> gradient_norm_vec;
+  std::vector<double> gradient_max_norm_vec;
+  std::vector<Eigen::Vector2d> param_vec;
+  std::vector<Eigen::Vector2d> gradient_vec;
+  std::vector<Eigen::Vector2d> dir_vec;
 #endif
 
   static void PrintSummary(const Summary &summary) {

@@ -2,6 +2,7 @@
 // Created by yangt on 18-12-21.
 //
 #include "non_constrained_optimiztion/line_search_step_length.hpp"
+#include "non_constrained_optimiztion/polynomial.hpp"
 
 namespace ncopt {
 StepLengthFunction::StepLengthFunction(GradientProblem *problem)
@@ -62,7 +63,7 @@ void LineSearchStepLength::FindPolynomialRoots(
         if (fabs(polynomial(0)) < 1e-6) {
             (*roots)(0) = std::numeric_limits<double>::infinity();
         } else {
-            (*roots)(0) = -polynomial(1) / 2 / polynomial(0);
+            (*roots)(0) = -polynomial(1) / 2.0 / polynomial(0);
         }
     }
     if (degree == 3) {
@@ -71,17 +72,19 @@ void LineSearchStepLength::FindPolynomialRoots(
             (*roots)(0) = std::numeric_limits<double>::infinity();
         } else if (fabs(polynomial(0)) < 1e-6) {
             roots->resize(1);
-            (*roots)(0) = -polynomial(1) / 2 / polynomial(0);
+            (*roots)(0) = -polynomial(1) / 2.0 / polynomial(0);
         } else {
             double judge =
-                    pow(polynomial(1), 2) - 3 * polynomial(0) * polynomial(2);
+                    pow(polynomial(1), 2) - 3.0 * polynomial(0) * polynomial(2);
             if (judge <= 0) {
                 roots->resize(1);
-                (*roots)(0) = -polynomial(1) / 3 / polynomial(0);
+                (*roots)(0) = -polynomial(1) / 3.0 / polynomial(0);
             } else {
                 roots->resize(2);
-                (*roots)(0) = -polynomial(1) / 3 / polynomial(0) + sqrt(judge);
-                (*roots)(1) = -polynomial(1) / 3 / polynomial(0) - sqrt(judge);
+                (*roots)(0) =
+                        -polynomial(1) / 3.0 / polynomial(0) + sqrt(judge);
+                (*roots)(1) =
+                        -polynomial(1) / 3.0 / polynomial(0) - sqrt(judge);
             }
         }
     }
@@ -120,25 +123,40 @@ Vector LineSearchStepLength::PolynomialInterpolating(
             }
         }
     }
-    return M.lu().solve(rhs);
-//    Eigen::FullPivLU<Matrix> lu(M);
-//    return lu.setThreshold(0.0).solve(rhs);
+//    return M.lu().solve(rhs);
+    Eigen::FullPivLU<Matrix> lu(M);
+    return lu.setThreshold(0.0).solve(rhs);
 }
 
 double LineSearchStepLength::InterpolateMinimizingStepLength(
-        const State &initial_state,
         const Samples &sample0,
         const Samples &sample1,
+        const Samples &sample2,
         const double lower_step,
         const double upper_step) const {
     if (options().interpolation_type == BISECTION) {
         return (sample0.a + sample1.a) / 2.0;
     }
     std::vector<Samples> samples;
-    samples.push_back(sample0);
-    samples.push_back(sample1);
-    samples.push_back(Samples(0, initial_state.cost,
-                              initial_state.directional_derivative));
+    if (sample0.is_value_valid) {
+        samples.push_back(sample0);
+    }
+    if (sample1.is_value_valid) {
+        samples.push_back(sample1);
+    }
+    if (options().interpolation_type == QUADRATIC) {
+        samples.push_back(Samples(sample2.a, sample2.value));
+    } else if (options().interpolation_type == CUBIC) {
+        samples.push_back(sample2);
+    }
+
+//    double step_optimal;
+//    double optimal_value;
+//    MinimizeInterpolatingPolynomial(samples,
+//                                    lower_step,
+//                                    upper_step,
+//                                    &step_optimal,
+//                                    &optimal_value);
 
     const Vector polynomial = PolynomialInterpolating(samples);
 
@@ -190,7 +208,7 @@ bool ArimjoSearch::DoSearch(const State &initial_state,
         is_evaluate_gradient = true;
     }
     function()->Evaluate(summary->initial_step, is_evaluate_gradient, &current);
-
+    const Samples unused_sample;
     while (true) {
         // sufficient decrease condition:
         if (current.value < initial_state.cost + options().sufficient_decrease
@@ -206,7 +224,7 @@ bool ArimjoSearch::DoSearch(const State &initial_state,
         }
         // choose optimal step length by funciton approximation
         double new_step = InterpolateMinimizingStepLength(
-                initial_state,
+                unused_sample,
                 previous,
                 current,
                 current.a * options().max_step_decrease_rate,
@@ -237,17 +255,16 @@ bool WolfSearch::Zoom(const State &initial_state,
     const double &dird0 = initial_state.directional_derivative;
     const double &c1 = options().sufficient_decrease;
     const double &c2 = options().sufficient_curvature_decrease;
-    double lower_step;
-    double upper_step;
-    lower_step =
-            std::min(s_lo->a, s_hi->a);// / options().min_step_decrease_rate;
-    upper_step =
-            std::max(s_lo->a, s_hi->a);// * options().min_step_decrease_rate;
     Samples current;
+    const Samples unused_sample;
     while (true) {
+        const double lower_step = std::min(s_lo->a,
+                                           s_hi->a);// / options().min_step_decrease_rate;
+        const double upper_step = std::max(s_lo->a,
+                                           s_hi->a);// * options().min_step_decrease_rate;
         // choose optimal step length by approximation
         *step =
-                InterpolateMinimizingStepLength(initial_state, *s_lo, *s_hi,
+                InterpolateMinimizingStepLength(unused_sample, *s_lo, *s_hi,
                                                 lower_step, upper_step);
         function()->Evaluate(*step, true, &current);
         if (fabs(s_hi->a - s_lo->a) < 1e-10
@@ -286,6 +303,7 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
     Samples current;//, upper;
     Samples previous
             (0, initial_state.cost, initial_state.directional_derivative);
+    const Samples unused_samples;
     function()->Evaluate(summary->initial_step, true, &current);
 //    function()->Evaluate(summary->initial_step, true, &upper);
     double step = 0.0;
@@ -313,7 +331,7 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
         }
         // choose step length by approximation
         double new_step = InterpolateMinimizingStepLength(
-                initial_state,
+                unused_samples,
                 previous,
                 current,
                 current.a,

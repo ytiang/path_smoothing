@@ -33,7 +33,7 @@ class LineSearchOption {
   LineSearchDirectionType line_search_direction_type = //STEEPEST_DESCENT;
           NONLINEAR_CONJUGATE_GRADIENT;
   NonlinearConjugateGradientType nonlinear_conjugate_gradient_type =
-          FLETCHER_REEVES;
+          POLAK_RIBIERE;
   double sufficient_decrease = 1e-4;
   double sufficient_curvature_decrease = 0.3;
   double min_line_search_step_length = 1e-16;

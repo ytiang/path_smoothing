@@ -34,7 +34,7 @@ double LineSearchMinimizer::GetInitialStepLength(const State &previous_state,
 //                state->step_length = std::min(10*state->step_length,
 //                                              1.0/current_state.gradient_norm);
             } else {
-                step_length = 1.0 / current_state.gradient_norm;
+                step_length = 1.0 / current_state.gradient_max_norm;
 //                step_length =
 //                        1.0 / current_state.gradient.lpNorm<Eigen::Infinity>();
             }
@@ -61,6 +61,8 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
     problem->Evaluate(param_ptr, &(current_state.cost),
                       current_state.gradient.data());
     current_state.gradient_norm = current_state.gradient.norm();
+    current_state.gradient_max_norm =
+            current_state.gradient.lpNorm<Eigen::Infinity>();
     current_state.x_norm = param.norm();
     previous_state.step_length = -1;
 
@@ -68,6 +70,17 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
     summary->search_step_fail_count = 0;
     summary->initial_cost = current_state.cost;
     summary->initial_gradient_norm = current_state.gradient_norm;
+
+#ifdef DEBUG
+    summary->step_length_vec.push_back(current_state.step_length);
+    summary->cost_vec.push_back(current_state.cost);
+    summary->gradient_norm_vec.push_back(current_state.gradient_norm);
+    summary->gradient_max_norm_vec.push_back(current_state.gradient_max_norm);
+    summary->dir_norm_vec.push_back(0);
+    summary->dir_vec.push_back(Eigen::Vector2d::Zero());
+    summary->param_vec.push_back(param);
+    summary->gradient_vec.push_back(current_state.gradient);
+#endif
 
     while (summary->solve_iteration_count <
             minimizer_option_.max_solve_iterations_num) {
@@ -80,7 +93,6 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
         if (summary->solve_iteration_count == 0) {
             current_state.search_direction = -current_state.gradient;
         } else {
-            // restart strategy
             direction_sercher->
                     NextDirection(previous_state, current_state,
                                   &(current_state.search_direction));
@@ -110,23 +122,35 @@ bool LineSearchMinimizer::Minimize(double *param_ptr,
                 return false;
             }
         }
-        current_state.step_length = summary->step;
-#ifdef DEBUG
-        summary->step_length_vec.push_back(summary->step);
-        summary->cost_vec.push_back(current_state.cost);
-        summary->gradient_norm_vec.push_back(current_state.gradient_norm);
-#endif
-        previous_state = current_state;
         // update current state:
+//        if (summary->solve_iteration_count == 0) {
+//            current_state.step_length = 0.0007879642166174;
+//        } else {
+            current_state.step_length = summary->step;
+//        }
+        previous_state = current_state;
         param = param
                 + current_state.step_length * current_state.search_direction;
         problem->Evaluate(param.data(), &(current_state.cost),
                           current_state.gradient.data());
         current_state.gradient_norm = current_state.gradient.norm();
+        current_state.gradient_max_norm =
+                current_state.gradient.lpNorm<Eigen::Infinity>();
         current_state.x_norm = param.norm();
         summary->final_cost = current_state.cost;
         summary->final_gradient_norm = current_state.gradient_norm;
         summary->solve_iteration_count++;
+
+#ifdef DEBUG
+        summary->step_length_vec.push_back(current_state.step_length);
+        summary->cost_vec.push_back(current_state.cost);
+        summary->gradient_norm_vec.push_back(current_state.gradient_norm);
+        summary->gradient_max_norm_vec.push_back(current_state.gradient_max_norm);
+        summary->dir_norm_vec.push_back(current_state.search_direction.norm());
+        summary->dir_vec.push_back(current_state.search_direction);
+        summary->param_vec.push_back(param);
+        summary->gradient_vec.push_back(current_state.gradient);
+#endif
     }
     summary->termination_type = ITERATION_COUNT_LIMITED;
 }

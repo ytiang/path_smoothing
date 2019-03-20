@@ -186,7 +186,7 @@ void DrivableMap::timerCb() {
 
     DistanceFunction2D dis_function(map_.maps, sdf_layer_, distance_threshold);
     options_.function = &(dis_function);
-//    options_.cg_solver = SELF_SOLVER;
+    options_.cg_solver = SELF_SOLVER;
 
     /// conjugate-gradient smoothing:
     options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
