@@ -122,30 +122,30 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
 
 void DrivableMap::reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
                                      uint32_t level) {
-//    params_.fromConfig(config);
-//    options_.cg_curvature_term_coe = params_.cg_curvature_term_coe;
-//    options_.cg_obstacle_term_coe = params_.cg_obstacle_term_coe;
-//    options_.cg_heading_term_coe = params_.cg_heading_term_coe;
-//    options_.gp_dt = params_.gp_dt;
-//    options_.gp_obs_sigma = params_.gp_obs_sigma;
-//    options_.gp_vehicle_dynamic_sigma = params_.gp_vehicle_dynamic_sigma;
-//    distance_threshold = params_.distance_threshold;
-//    if (params_.cg_solver_type == params_.cg_solver_type_Ceres) {
-//        options_.cg_solver = NonlinearSolverType::CERES_SOLVER;
-//        printf(">>>> cg nonlinear solver type : Ceres\n");
-//    } else if (params_.cg_solver_type == params_.cg_solver_type_Self) {
-//        options_.cg_solver = NonlinearSolverType::SELF_SOLVER;
-//        printf(">>>> cg nonlinear solver type : Self\n");
-//    }
-//
-//    printf(">>>> distance threshold: %f\n", distance_threshold);
-//    printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
-//    printf(">>>> heading coe: %f\n", options_.cg_heading_term_coe);
-//    printf(">>>> obstacle coe: %f\n", options_.cg_obstacle_term_coe);
-//    printf(">>>> gp delta t: %f\n", options_.gp_dt);
-//    printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
-//    printf(">>>> gp vehicle dynamic sigma: %f\n",
-//           options_.gp_vehicle_dynamic_sigma);
+    params_.fromConfig(config);
+    options_.cg_curvature_term_coe = params_.cg_curvature_term_coe;
+    options_.cg_obstacle_term_coe = params_.cg_obstacle_term_coe;
+    options_.cg_heading_term_coe = params_.cg_heading_term_coe;
+    options_.gp_dt = params_.gp_dt;
+    options_.gp_obs_sigma = params_.gp_obs_sigma;
+    options_.gp_vehicle_dynamic_sigma = params_.gp_vehicle_dynamic_sigma;
+    distance_threshold = params_.distance_threshold;
+    if (params_.cg_solver_type == params_.cg_solver_type_Ceres) {
+        options_.cg_solver = NonlinearSolverType::CERES_SOLVER;
+        printf(">>>> cg nonlinear solver type : Ceres\n");
+    } else if (params_.cg_solver_type == params_.cg_solver_type_Self) {
+        options_.cg_solver = NonlinearSolverType::SELF_SOLVER;
+        printf(">>>> cg nonlinear solver type : Self\n");
+    }
+
+    printf(">>>> distance threshold: %f\n", distance_threshold);
+    printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
+    printf(">>>> heading coe: %f\n", options_.cg_heading_term_coe);
+    printf(">>>> obstacle coe: %f\n", options_.cg_obstacle_term_coe);
+    printf(">>>> gp delta t: %f\n", options_.gp_dt);
+    printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
+    printf(">>>> gp vehicle dynamic sigma: %f\n",
+           options_.gp_vehicle_dynamic_sigma);
 
 }
 
