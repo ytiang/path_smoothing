@@ -13,7 +13,7 @@ namespace ncopt {
 class LineSearchDirection {
 public:
 
-    static LineSearchDirection *Create(const LineSearchOption &options);
+    static LineSearchDirection *Create(const LineSearchOption &options, int dim);
 
     virtual ~LineSearchDirection() {}
 
@@ -42,7 +42,21 @@ class NonConjugateDirection : public LineSearchDirection {
 
  private:
     const NonlinearConjugateGradientType type_;
+};
 
+class QuasiNewtonDirection : public LineSearchDirection {
+ public:
+  QuasiNewtonDirection(const QuasiNewtonType type, int dim);
+  virtual ~QuasiNewtonDirection() {}
+  virtual void NextDirection(const LineSearchMinimizer::State &previous,
+                             const LineSearchMinimizer::State &current,
+                             Vector *search_direction);
+
+ private:
+  const QuasiNewtonType type_;
+  Matrix H_inv_;
+  Matrix identity_;
+  const int dim_;
 };
 
 }

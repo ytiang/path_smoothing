@@ -6,12 +6,15 @@
 namespace ncopt {
 
 LineSearchDirection *LineSearchDirection::
-Create(const LineSearchOption &options) {
+Create(const LineSearchOption &options, int dim) {
     switch (options.line_search_direction_type) {
         case STEEPEST_DESCENT:return new SteepdestDescentDirection();
         case NONLINEAR_CONJUGATE_GRADIENT:
             return new NonConjugateDirection(
                     options.nonlinear_conjugate_gradient_type);
+        case QUASI_NEWTON:
+            return new QuasiNewtonDirection(options.quasi_nweton_type,
+                                            dim);
     }
 }
 
@@ -32,7 +35,8 @@ void NonConjugateDirection::NextDirection(
     double beta = 0.0;
     switch (type_) {
         case FLETCHER_REEVES: {
-            beta = current.gradient_norm / previous.gradient_norm;
+            beta = current.gradient.dot(current.gradient)
+                    / previous.gradient.dot(previous.gradient);
             break;
         }
         case POLAK_RIBIERE: {
@@ -47,7 +51,8 @@ void NonConjugateDirection::NextDirection(
             break;
         }
         case FR_PR: {
-            double beta_fr = pow(current.gradient_norm, 2) / pow(previous.gradient_norm, 2);
+            double beta_fr = pow(current.gradient_norm, 2)
+                    / pow(previous.gradient_norm, 2);
             double beta_pr =
                     current.gradient.dot(current.gradient - previous.gradient)
                             / std::pow(previous.gradient_norm, 2);
@@ -66,6 +71,29 @@ void NonConjugateDirection::NextDirection(
     if (current.gradient.dot(*search_direction) > -1e-6) {
         *search_direction = -current.gradient;
 //        LOG(WARNING) << "Restarting non-linear conjugate gradients: ";
+    }
+}
+
+QuasiNewtonDirection::QuasiNewtonDirection(const QuasiNewtonType type, int dim)
+        : type_(type),
+          dim_(dim) {
+    H_inv_ = Matrix::Identity(dim, dim);
+    identity_ = Matrix::Identity(dim, dim);
+}
+
+void QuasiNewtonDirection::NextDirection(const LineSearchMinimizer::State &previous,
+                                         const LineSearchMinimizer::State &current,
+                                         Vector *search_direction) {
+    const auto s_k = previous.step_length * previous.search_direction;
+    const auto y_k = current.gradient - previous.gradient;
+    const double p = 1.0 / (s_k.transpose() * y_k);
+    switch (type_) {
+        case BFGS: {
+            const Matrix M = identity_ - p * s_k * y_k.transpose();
+            H_inv_ = M * H_inv_ * M.transpose() + p * s_k * s_k.transpose();
+            *search_direction = -H_inv_ * current.gradient;
+            break;
+        }
     }
 }
 

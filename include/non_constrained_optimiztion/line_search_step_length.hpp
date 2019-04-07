@@ -62,6 +62,21 @@ class StepLengthFunction {
   Vector direction_;
 };
 
+class PlotFunction {
+ public:
+  PlotFunction();
+  void SetFunc(StepLengthFunction *function, double initial_step);
+  void SetApproxFunc(const Vector &poly);
+  void plot();
+ private:
+  std::vector<double> optimal_step_;
+  std::vector<double> optimal_func_;
+  std::vector<double> step_;
+  std::vector<double> func_;
+  std::vector<double> gradient_;
+  std::vector<double> approx_funx_;
+};
+
 class LineSearchStepLength {
  public:
   typedef Minimizer::State State;
@@ -77,18 +92,20 @@ class LineSearchStepLength {
                                          const Samples &sample1,
                                          const Samples &sample2,
                                          const double lower_step,
-                                         const double upper_step) const;
+                                         const double upper_step);
 
   Vector PolynomialInterpolating(const std::vector<Samples> &samples) const;
 
   void FindPolynomialRoots(const Vector &polynomial, Vector *roots) const;
 
-  double EvaluatePolynomial(const Vector &polynomial, double x) const;
-
   virtual bool DoSearch(const State &initial_state,
                         Summary *summary) = 0;
 
   virtual ~LineSearchStepLength() {}
+
+#ifdef DEBUG
+  PlotFunction plot_;
+#endif
 
  protected:
   inline const LineSearchOption &options() const {
@@ -126,7 +143,6 @@ class WolfSearch : public LineSearchStepLength {
               double *step,
               Summary *summary);
 
- private:
 };
 
 }

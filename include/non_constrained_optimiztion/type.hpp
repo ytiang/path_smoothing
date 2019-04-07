@@ -137,14 +137,33 @@ enum MinimizerType {
 
 enum LineSearchDirectionType {
   // Negative of the gradient.
-    STEEPEST_DESCENT,
+  STEEPEST_DESCENT,
 
   // A generalization of the Conjugate Gradient method to non-linear
   // functions. The generalization can be performed in a number of
   // different ways, resulting in a variety of search directions. The
   // precise choice of the non-linear conjugate gradient algorithm
   // used is determined by NonlinerConjuateGradientType.
-    NONLINEAR_CONJUGATE_GRADIENT,
+  NONLINEAR_CONJUGATE_GRADIENT,
+
+  QUASI_NEWTON,
+
+};
+
+// Nonlinear conjugate gradient methods are a generalization of the
+// method of Conjugate Gradients for linear systems. The
+// generalization can be carried out in a number of different ways
+// leading to number of different rules for computing the search
+// direction. Ceres provides a number of different variants. For more
+// details see Numerical Optimization by Nocedal & Wright.
+enum NonlinearConjugateGradientType {
+  FLETCHER_REEVES,
+  POLAK_RIBIERE,
+  POLAK_RIBIERE_PLUS,
+  FR_PR,
+};
+
+enum QuasiNewtonType {
 
   // BFGS, and it's limited memory approximation L-BFGS, are quasi-Newton
   // algorithms that approximate the Hessian matrix by iteratively refining
@@ -199,28 +218,15 @@ enum LineSearchDirectionType {
   // A general reference for both methods:
   //
   // Nocedal J., Wright S., Numerical Optimization, 2nd Ed. Springer, 1999.
-    LBFGS,
-    BFGS,
-};
-
-// Nonlinear conjugate gradient methods are a generalization of the
-// method of Conjugate Gradients for linear systems. The
-// generalization can be carried out in a number of different ways
-// leading to number of different rules for computing the search
-// direction. Ceres provides a number of different variants. For more
-// details see Numerical Optimization by Nocedal & Wright.
-enum NonlinearConjugateGradientType {
-    FLETCHER_REEVES,
-    POLAK_RIBIERE,
-    POLAK_RIBIERE_PLUS,
-    FR_PR,
+  LBFGS,
+  BFGS,
 };
 
 enum LineSearchType {
   // Backtracking line search with polynomial interpolation or
   // bisection.
-    ARMIJO,
-    WOLFE,
+          ARMIJO,
+  WOLFE,
 };
 
 // Ceres supports different strategies for computing the trust region

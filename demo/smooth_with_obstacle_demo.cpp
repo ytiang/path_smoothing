@@ -12,6 +12,7 @@
 #include "opt_utils/opt_utils.hpp"
 #include "path_smoothing/path_smoothing.hpp"
 #include "path_smoothing/smoothing_demoParameters.h"
+#include "internal_grid_map/internal_grid_map.hpp"
 
 class DrivableMap {
  public:
@@ -75,19 +76,11 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
         }
     }
     inveres_map.updateDistanceLayerCV();
-    double th = 2.8;
     for (grid_map::GridMapIterator it(inveres_map.maps); !it.isPastEnd();
          ++it) {
         const auto cost = map_.maps.at(map_.dis, *it)
                 - inveres_map.maps.at(map_.dis, *it);
         map_.maps.at(sdf_layer_, *it) = cost;
-//        if (cost < 0.0) {
-//            map_.maps.at(sdf_layer_, *it) = th - cost;
-//        } else if (cost <= th) {
-//            map_.maps.at(sdf_layer_, *it) = pow(cost - th, 2) / th;
-//        } else {
-//            map_.maps.at(sdf_layer_, *it) = 0;
-//        }
     }
 
     io::CSVReader<2> in(base_dir_ + "/demo/a_star_path.csv");
@@ -129,23 +122,30 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
 
 void DrivableMap::reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
                                      uint32_t level) {
-    params_.fromConfig(config);
-    options_.cg_curvature_term_coe = params_.cg_curvature_term_coe;
-    options_.cg_obstacle_term_coe = params_.cg_obstacle_term_coe;
-    options_.cg_heading_term_coe = params_.cg_heading_term_coe;
-    options_.gp_dt = params_.gp_dt;
-    options_.gp_obs_sigma = params_.gp_obs_sigma;
-    options_.gp_vehicle_dynamic_sigma = params_.gp_vehicle_dynamic_sigma;
-    distance_threshold = params_.distance_threshold;
-
-    printf(">>>> distance threshold: %f\n", distance_threshold);
-    printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
-    printf(">>>> heading coe: %f\n", options_.cg_heading_term_coe);
-    printf(">>>> obstacle coe: %f\n", options_.cg_obstacle_term_coe);
-    printf(">>>> gp delta t: %f\n", options_.gp_dt);
-    printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
-    printf(">>>> gp vehicle dynamic sigma: %f\n",
-           options_.gp_vehicle_dynamic_sigma);
+//    params_.fromConfig(config);
+//    options_.cg_curvature_term_coe = params_.cg_curvature_term_coe;
+//    options_.cg_obstacle_term_coe = params_.cg_obstacle_term_coe;
+//    options_.cg_heading_term_coe = params_.cg_heading_term_coe;
+//    options_.gp_dt = params_.gp_dt;
+//    options_.gp_obs_sigma = params_.gp_obs_sigma;
+//    options_.gp_vehicle_dynamic_sigma = params_.gp_vehicle_dynamic_sigma;
+//    distance_threshold = params_.distance_threshold;
+//    if (params_.cg_solver_type == params_.cg_solver_type_Ceres) {
+//        options_.cg_solver = NonlinearSolverType::CERES_SOLVER;
+//        printf(">>>> cg nonlinear solver type : Ceres\n");
+//    } else if (params_.cg_solver_type == params_.cg_solver_type_Self) {
+//        options_.cg_solver = NonlinearSolverType::SELF_SOLVER;
+//        printf(">>>> cg nonlinear solver type : Self\n");
+//    }
+//
+//    printf(">>>> distance threshold: %f\n", distance_threshold);
+//    printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
+//    printf(">>>> heading coe: %f\n", options_.cg_heading_term_coe);
+//    printf(">>>> obstacle coe: %f\n", options_.cg_obstacle_term_coe);
+//    printf(">>>> gp delta t: %f\n", options_.gp_dt);
+//    printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
+//    printf(">>>> gp vehicle dynamic sigma: %f\n",
+//           options_.gp_vehicle_dynamic_sigma);
 
 }
 
@@ -186,7 +186,7 @@ void DrivableMap::timerCb() {
 
     DistanceFunction2D dis_function(map_.maps, sdf_layer_, distance_threshold);
     options_.function = &(dis_function);
-    options_.cg_solver = SELF_SOLVER;
+//    options_.cg_solver = SELF_SOLVER;
 
     /// conjugate-gradient smoothing:
     options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
@@ -214,6 +214,10 @@ void DrivableMap::timerCb() {
     smoother2->smoothPath(options_);
     t2 = hmpl::now();
     printf("gp smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
+    printf("    gp parameters: obs: %f, dynamic: %f, dt: %f\n",
+           options_.gp_obs_sigma,
+           options_.gp_vehicle_dynamic_sigma,
+           options_.gp_dt);
     smoother2->getPointPath(&path);
     nav_msgs::Path smooth2_path;
     smooth2_path.header = smooth_path.header;

@@ -43,15 +43,6 @@ Create(const LineSearchOption &options, StepLengthFunction *function) {
     }
 }
 
-double LineSearchStepLength::EvaluatePolynomial(const Vector &polynomial,
-                                                double x) const {
-    double v = 0.0;
-    for (int i(0); i < polynomial.size(); ++i) {
-        v = v * x + polynomial(i);
-    }
-    return v;
-}
-
 void LineSearchStepLength::FindPolynomialRoots(
         const Vector &polynomial, Vector *roots) const {
     int degree = polynomial.size() - 1;
@@ -82,9 +73,9 @@ void LineSearchStepLength::FindPolynomialRoots(
             } else {
                 roots->resize(2);
                 (*roots)(0) =
-                        -polynomial(1) / 3.0 / polynomial(0) + sqrt(judge);
+                        (-polynomial(1) + sqrt(judge)) / 3.0 / polynomial(0);
                 (*roots)(1) =
-                        -polynomial(1) / 3.0 / polynomial(0) - sqrt(judge);
+                        (-polynomial(1) - sqrt(judge)) / 3.0 / polynomial(0);
             }
         }
     }
@@ -133,7 +124,7 @@ double LineSearchStepLength::InterpolateMinimizingStepLength(
         const Samples &sample1,
         const Samples &sample2,
         const double lower_step,
-        const double upper_step) const {
+        const double upper_step) {
     if (options().interpolation_type == BISECTION) {
         return (sample0.a + sample1.a) / 2.0;
     }
@@ -161,21 +152,24 @@ double LineSearchStepLength::InterpolateMinimizingStepLength(
     const Vector polynomial = PolynomialInterpolating(samples);
 
     if (polynomial.size() < 3) {
-        std::cout << polynomial << "\n";
+        LOG(ERROR) << "polynomial size is " << polynomial.size()
+                   << ", which less than specified degree";
     }
-
-    const double lower_step_value = EvaluatePolynomial(polynomial, lower_step);
-    const double upper_step_value = EvaluatePolynomial(polynomial, upper_step);
+    const double delta = (upper_step - lower_step) / 20.0;
+    const double lower = lower_step + delta;
+    const double upper = upper_step - delta;
+    const double lower_value = EvaluatePolynomial(polynomial, lower);
+    const double upper_value = EvaluatePolynomial(polynomial, upper);
     double step_optimal = (lower_step + upper_step) / 2.0;
     double step_optimal_valuel = EvaluatePolynomial(polynomial, step_optimal);
 
-    if (step_optimal_valuel > lower_step_value) {
-        step_optimal_valuel = lower_step_value;
-        step_optimal = lower_step;
+    if (step_optimal_valuel > lower_value) {
+        step_optimal_valuel = lower_value;
+        step_optimal = lower;
     }
-    if (step_optimal_valuel > upper_step_value) {
-        step_optimal_valuel = upper_step_value;
-        step_optimal = upper_step;
+    if (step_optimal_valuel > upper_value) {
+        step_optimal_valuel = upper_value;
+        step_optimal = upper;
     }
     Vector roots;
     FindPolynomialRoots(polynomial, &roots);
@@ -189,6 +183,17 @@ double LineSearchStepLength::InterpolateMinimizingStepLength(
             step_optimal = roots(i);
         }
     }
+#ifdef DEBUG
+    printf(">>>> lower:(%f, %f), upper:(%f, %f), optimal:(%f, %f)\n",
+           lower,
+           lower_value,
+           upper,
+           upper_value,
+           step_optimal,
+           step_optimal_valuel);
+    plot_.SetApproxFunc(polynomial);
+    plot_.plot();
+#endif
     return step_optimal;
 }
 
@@ -255,33 +260,59 @@ bool WolfSearch::Zoom(const State &initial_state,
     const double &dird0 = initial_state.directional_derivative;
     const double &c1 = options().sufficient_decrease;
     const double &c2 = options().sufficient_curvature_decrease;
+#ifdef DEBUG
+    printf(">>>> initial zoom section [%f, %f]\n", s_lo->a, s_hi->a);
+#endif
+    double weak_step = -1.0;
     Samples current;
     const Samples unused_sample;
     while (true) {
         const double lower_step = std::min(s_lo->a,
-                                           s_hi->a);// / options().min_step_decrease_rate;
+                                           s_hi->a);
         const double upper_step = std::max(s_lo->a,
-                                           s_hi->a);// * options().min_step_decrease_rate;
+                                           s_hi->a);
         // choose optimal step length by approximation
         *step =
                 InterpolateMinimizingStepLength(unused_sample, *s_lo, *s_hi,
                                                 lower_step, upper_step);
         function()->Evaluate(*step, true, &current);
-        if (fabs(s_hi->a - s_lo->a) < 1e-10
-                || summary->line_search_iteration_count > 60) {
-            LOG(WARNING)
-                    << "Zoom Section: [" << s_lo->a << ", "
-                    << s_hi->a << "] doesn't contain aviable step length!!";
-            return false;
+        if (summary->line_search_iteration_count > 10) {
+            if (weak_step > 0) {
+                *step = weak_step;
+                LOG(WARNING)
+                        << "Zoom can't find a point satisfy strong wolfe condition except wolfe condition";
+                return true;
+            } else {
+                LOG(WARNING)
+                        << "Zoom pathse iteration exceed limitation, final section: ["
+                        << s_lo->a << ", " << s_hi->a << "]";
+                return false;
+            }
+        }
+        if (fabs(s_hi->a - s_lo->a) < 1e-10) {
+            if (weak_step > 0) {
+                *step = weak_step;
+                LOG(WARNING)
+                        << "Zoom can't find a point satisfy strong wolfe condition except wolfe condition";
+                return true;
+            } else {
+                LOG(WARNING)
+                        << "Zoom Section: [" << s_lo->a << ", "
+                        << s_hi->a << "] doesn't contain aviable step length!!";
+                return false;
+            }
         }
         if (current.value > cost0 + c1 * current.a * dird0
                 || current.value >= s_lo->value) {
             *s_hi = current;
         } else {
             // curvature sufficient decrease condition:
-            if (fabs(current.gradient) <= -c2 * dird0) {
-                *step = current.a;
-                return true;
+            if (current.gradient >= c2 * dird0) {
+                weak_step = current.a;
+                if (fabs(current.gradient) <= fabs(c2 * dird0)) {
+                    *step = current.a;
+                    return true;
+                }
             }
             if (current.gradient * (s_hi->a - s_lo->a) >= 0) {
                 *s_hi = *s_lo;
@@ -298,15 +329,20 @@ bool WolfSearch::DoSearch(const State &initial_state, Summary *summary) {
     const Vector &direction = initial_state.search_direction;
     const double &c1 = options().sufficient_decrease;
     const double &c2 = options().sufficient_curvature_decrease;
-
     summary->line_search_iteration_count = 1;
     Samples current;//, upper;
     Samples previous
             (0, initial_state.cost, initial_state.directional_derivative);
     const Samples unused_samples;
     function()->Evaluate(summary->initial_step, true, &current);
-//    function()->Evaluate(summary->initial_step, true, &upper);
     double step = 0.0;
+#ifdef DEBUG
+    printf(">>>> initial step: %f, cost: %f, gradient: %f\n",
+           current.a,
+           current.value,
+           current.gradient);
+    plot_.SetFunc(function(), summary->initial_step);
+#endif
 
     while (true) {
         if (current.value > cost0 + c1 * current.a * dird0 ||

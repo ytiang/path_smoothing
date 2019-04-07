@@ -15,7 +15,7 @@ class BasicOption {
       minimizer_type = LINE_SEARCH;
       function_tolerance = 1e-6;
       gradient_norm_tolerance = 1e-10;
-      max_solve_iterations_num = 70;
+      max_solve_iterations_num = 30;
       step_norm_torelance_coe = 1e-8;
   }
   MinimizerType minimizer_type;
@@ -29,13 +29,14 @@ class BasicOption {
 class LineSearchOption {
  public:
   LineSearchType line_search_type = WOLFE;
-  LineSearchInterpolationType interpolation_type = QUADRATIC;
-  LineSearchDirectionType line_search_direction_type = //STEEPEST_DESCENT;
-          NONLINEAR_CONJUGATE_GRADIENT;
+  LineSearchInterpolationType interpolation_type = QUADRATIC; //CUBIC; //
+  LineSearchDirectionType line_search_direction_type =  //STEEPEST_DESCENT;
+          QUASI_NEWTON; //NONLINEAR_CONJUGATE_GRADIENT;//
   NonlinearConjugateGradientType nonlinear_conjugate_gradient_type =
-          POLAK_RIBIERE;
+          FLETCHER_REEVES; //POLAK_RIBIERE; //FR_PR; //
+  QuasiNewtonType quasi_nweton_type = BFGS;
   double sufficient_decrease = 1e-4;
-  double sufficient_curvature_decrease = 0.3;
+  double sufficient_curvature_decrease = 0.2;
   double min_line_search_step_length = 1e-16;
   double max_step_decrease_rate = 1e-3;
   double min_step_decrease_rate = 0.92;
