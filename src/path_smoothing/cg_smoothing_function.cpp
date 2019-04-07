@@ -10,7 +10,6 @@ CgSmoothingFunction::CgSmoothingFunction(const Settings &settings) : settings_(
 
 }
 
-//template<class PointType>
 CgSmoothingFunction *CgSmoothingFunction::createCgSmoothingFunction(const Settings &settings,
                                                                     const Vector &param) {
     CHECK_EQ(settings.param_num, param.size())

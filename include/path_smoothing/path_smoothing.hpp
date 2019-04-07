@@ -17,7 +17,6 @@
 
 #include "path_smoothing/cg_smoothing_function.hpp"
 #include "non_constrained_optimiztion/gradient_problem_solve.hpp"
-#include "geometry_msgs/Point.h"
 
 namespace path_smoothing {
 
@@ -32,9 +31,9 @@ class PathSmoothing {
     DifferenceType cg_difference_type = CPPAD;
     NonlinearSolverType cg_solver = CERES_SOLVER;
     // options for gp method
-    double gp_obs_sigma = 0.03;
-    double gp_vehicle_dynamic_sigma = 0.02;
-    double gp_dt = 0.4;
+    double gp_obs_sigma = 0.05;
+    double gp_vehicle_dynamic_sigma = 0.00;
+    double gp_dt = 0.5;
     LeastSquaresSolver gp_solver = LEVENBERG_MARQUARDT;
 
     // options for signed distance field

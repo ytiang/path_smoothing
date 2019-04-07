@@ -10,7 +10,6 @@
 #include <Eigen/Core>
 #include <ceres/ceres.h>
 #include "non_constrained_optimiztion/gradient_problem.hpp"
-#include "internal_grid_map/internal_grid_map.hpp"
 #include "path_smoothing/distance_function.hpp"
 //#include "path_smoothing/path_smoothing_type.hpp"
 

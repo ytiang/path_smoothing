@@ -21,14 +21,14 @@ void CgSmoothing::smoothPath(const Options &options) {
             option.line_search_interpolation_type = ceres::QUADRATIC;
             option.line_search_type = ceres::WOLFE;
             option.line_search_sufficient_function_decrease = 1e-4;
-            option.line_search_sufficient_curvature_decrease = 0.4;
+            option.line_search_sufficient_curvature_decrease = 0.2;
 //            option.min_line_search_step_contraction = 0.92;
             option.max_line_search_step_contraction = 1e-4;
             option.line_search_direction_type =
                     ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
-            option.max_num_iterations = 100;
+            option.max_num_iterations = 30;
             ceres::Solve(option, problem, params_.data(), &summary);
-//            std::cout << summary.FullReport();
+            std::cout << summary.FullReport();
             break;
         }
         case SELF_SOLVER: {

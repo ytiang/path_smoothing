@@ -43,7 +43,9 @@ class DistanceFunction2D {
       const grid_map::Position pt(x, y);
       double cost = 0.0;
       if (sdf_.isInside(pt)) {
-          const auto &dis = sdf_.atPosition(layer_, pt);
+          const auto &dis = sdf_.atPosition(layer_,
+                                            pt,
+                                            grid_map::InterpolationMethods::INTER_LINEAR);
           if (dis <= 0) {
               cost = th_ - dis;
           } else if (dis <= th_) {
@@ -65,16 +67,8 @@ class DistanceFunction2D {
           const double y0 = std::max(y - delta, -half_y);
           const double x_ii = std::min(x + delta, half_x);
           const double y_ii = std::min(y + delta, half_y);
-          const double gradient_x = (cost(x_ii, y) - cost(x0, y)) / 2 / delta;
-          const double gradient_y = (cost(x, y_ii) - cost(x, y0)) / 2 / delta;
-          const auto &dis = sdf_.atPosition(layer_, p_i);
-          if (dis <= 0) {
-              *gradient = -gradient_x;
-              *(gradient + 1) = -gradient_y;
-          } else if (dis <= th_) {
-              *gradient = 2 / th_ * (dis - th_) * gradient_x;
-              *(gradient + 1) = 2 / th_ * (dis - th_) * gradient_y;
-          }
+          *gradient = (cost(x_ii, y) - cost(x0, y)) / 2 / delta;
+          *(gradient + 1) = (cost(x, y_ii) - cost(x, y0)) / 2 / delta;
       }
   }
 
