@@ -25,7 +25,8 @@ const char *LineSearchDirectionTypeToString(
     switch (type) {
         CASESTR(STEEPEST_DESCENT);
         CASESTR(NONLINEAR_CONJUGATE_GRADIENT);
-        CASESTR(QUASI_NEWTON);
+        CASESTR(BFGS);
+        CASESTR(LBFGS);
     }
 }
 

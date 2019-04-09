@@ -19,7 +19,8 @@ double LineSearchMinimizer::GetInitialStepLength(const State &previous_state,
                                                  const Summary &summary) const {
     double step_length = 0.0;
     switch (minimizer_option_.line_search_direction_type) {
-        case QUASI_NEWTON:
+        case BFGS:
+        case LBFGS:
 //            step_length = 1.0;
 //            break;
         case STEEPEST_DESCENT:

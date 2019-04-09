@@ -12,9 +12,8 @@ Create(const LineSearchOption &options, int dim) {
         case NONLINEAR_CONJUGATE_GRADIENT:
             return new NonConjugateDirection(
                     options.nonlinear_conjugate_gradient_type);
-        case QUASI_NEWTON:
-            return new QuasiNewtonDirection(options.quasi_nweton_type,
-                                            dim);
+        case BFGS:return new BFGSDirection(dim);
+        case LBFGS: return new LBFGSDirection(dim);
     }
 }
 
@@ -68,34 +67,68 @@ void NonConjugateDirection::NextDirection(
     }
     *search_direction = -current.gradient + beta * previous.search_direction;
 
-    if (current.gradient.dot(*search_direction) > -1e-6) {
+    if (fabs(current.gradient.dot(*search_direction)) < 1e-6) {
         *search_direction = -current.gradient;
 //        LOG(WARNING) << "Restarting non-linear conjugate gradients: ";
     }
 }
 
-QuasiNewtonDirection::QuasiNewtonDirection(const QuasiNewtonType type, int dim)
-        : type_(type),
-          dim_(dim) {
+BFGSDirection::BFGSDirection(int dim)
+        : dim_(dim) {
     H_inv_ = Matrix::Identity(dim, dim);
     identity_ = Matrix::Identity(dim, dim);
 }
 
-void QuasiNewtonDirection::NextDirection(const LineSearchMinimizer::State &previous,
-                                         const LineSearchMinimizer::State &current,
-                                         Vector *search_direction) {
-    const auto s_k = previous.step_length * previous.search_direction;
-    const auto y_k = current.gradient - previous.gradient;
-    const double p = 1.0 / (s_k.transpose() * y_k);
-    switch (type_) {
-        case BFGS: {
-            const Matrix M = identity_ - p * s_k * y_k.transpose();
-            H_inv_ = M * H_inv_ * M.transpose() + p * s_k * s_k.transpose();
-            *search_direction = -H_inv_ * current.gradient;
-            break;
-        }
+void BFGSDirection::NextDirection(const LineSearchMinimizer::State &previous,
+                                  const LineSearchMinimizer::State &current,
+                                  Vector *search_direction) {
+    const auto s = previous.step_length * previous.search_direction;
+    const auto y = current.gradient - previous.gradient;
+    const double p = 1.0 / (s.transpose() * y);
+    const Matrix M = identity_ - p * s * y.transpose();
+    H_inv_ = M * H_inv_ * M.transpose() + p * s * s.transpose();
+    *search_direction = -H_inv_ * current.gradient;
+}
+
+LBFGSDirection::LBFGSDirection(int dim)
+        : dim_(dim),
+          length_(15),
+          s_(length_),
+          y_(length_),
+          rho_(length_) {
+}
+
+void LBFGSDirection::NextDirection(const LineSearchMinimizer::State &previous,
+                                   const LineSearchMinimizer::State &current,
+                                   Vector *search_direction) {
+    // s_{k-1} = x_{k} - x_{k-1} = alpha * p_{k-1}
+    // y_{k-1} = g_{k} - g_{k-1};
+    const Vector s = previous.step_length * previous.search_direction;
+    const Vector y = current.gradient - previous.gradient;
+    this->s_.push_back(s);
+    this->y_.push_back(y);
+    this->rho_.push_back(1.0 / (s.transpose() * y));
+    const auto size = s_.size();
+
+    auto q = current.gradient;
+    double alpha[size];
+    for (int i(0); i < size; ++i) {
+        const int j = size - i - 1;
+        alpha[j] = rho_[j] * s_[j].transpose() * q;
+        q = q - alpha[j] * y_[j];
     }
+
+    Vector r = rho_.back() / y_.back().squaredNorm() * q;
+//    auto r = q;
+
+    for (int i(0); i < size; ++i) {
+        const double beta = rho_[i] * y_[i].transpose() * r;
+        r = r + (alpha[i] - beta) * s_[i];
+    }
+    *search_direction = -r;
 }
 
 }
+
+
 

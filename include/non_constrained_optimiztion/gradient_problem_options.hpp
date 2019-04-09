@@ -31,10 +31,9 @@ class LineSearchOption {
   LineSearchType line_search_type = WOLFE;
   LineSearchInterpolationType interpolation_type = QUADRATIC; //CUBIC; //
   LineSearchDirectionType line_search_direction_type =  //STEEPEST_DESCENT;
-          QUASI_NEWTON; //NONLINEAR_CONJUGATE_GRADIENT;//
+          NONLINEAR_CONJUGATE_GRADIENT;//LBFGS; //
   NonlinearConjugateGradientType nonlinear_conjugate_gradient_type =
           FLETCHER_REEVES; //POLAK_RIBIERE; //FR_PR; //
-  QuasiNewtonType quasi_nweton_type = BFGS;
   double sufficient_decrease = 1e-4;
   double sufficient_curvature_decrease = 0.2;
   double min_line_search_step_length = 1e-16;
