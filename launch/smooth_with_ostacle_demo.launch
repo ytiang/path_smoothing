@@ -1,0 +1,11 @@
+<launch>
+
+    <node pkg="path_smoothing" type="smooth_with_obstacle_demo"
+          name="path_smooth_demo" output="screen">
+    </node>
+
+    <node name="reconfigure_gui" pkg="rqt_reconfigure" type="rqt_reconfigure"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find path_smoothing)/rviz/smooth_demo.rviz" output="screen" />
+
+</launch>
