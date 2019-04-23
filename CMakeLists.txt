@@ -1,85 +1,78 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8)
 project(path_smoothing)
-#set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release")
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+  message(STATUS "CMAKE BUILD TYPE: " ${CMAKE_BUILD_TYPE})
+  add_definitions(-DDEBUG)
+endif ()
+
 set(catkin_deps
-  opt_utils
-  tf2
-  tf2_ros
-  tf2_geometry_msgs
-  roslib
-  roscpp
-  grid_map_ros
-  grid_map_visualization
-  nav_msgs
-  anm_msgs
-  geometry_msgs
-  interactive_markers
-  lanelet_map_msgs
-  internal_grid_map
-  visualization_msgs
-  dynamic_reconfigure
   rosparam_handler
-)
+  dynamic_reconfigure
+  grid_map_core
+  )
 
 find_package(catkin REQUIRED COMPONENTS
-  ${catkin_deps}
-)
-find_package(Boost COMPONENTS filesystem REQUIRED)
-find_package(OpenCV 3 REQUIRED)
-find_package(Eigen3 QUIET)
+  ${catkin_deps})
 find_package(Ceres REQUIRED)
+find_package(casadi REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(gpmp2 QUIET)
+find_package(GTSAM QUIET)
 
-generate_ros_parameter_files(config/param.cfg)
-###################################
-## catkin specific configuration ##
-###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
+find_package(PythonLibs 2.7 REQUIRED)
+
+if (${GTSAM_FOUND} AND ${gpmp2_FOUND})
+  find_package(Boost COMPONENTS filesystem serialization thread regex timer REQUIRED)
+  add_definitions(-DGPMP2_SMOOTHING_ENABLE)
+  message("enable gpmp2 smoothing method")
+endif ()
+
+generate_ros_parameter_files(
+  cfg/smoothing_demo.params)
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME}
+  LIBRARIES ${PROJECT_NAME} ncopt
   CATKIN_DEPENDS ${catkin_deps}
-#  DEPENDS OpenCV
+  DEPENDS CERES CASADI EIGEN3
 )
 
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${Boost_FILESYSTEM_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
   ${CERES_INCLUDE_DIRS}
+  ${gpmp2_INCLUDE_DIR}
+  ${GTSAM_INCLUDE_DIR}
+  ${CASADI_INCLUDE_DIR}
+  ${PYTHON_INCLUDE_DIRS}
 )
+aux_source_directory(src/non_constrained_optimiztion ncopt_src)
+add_library(ncopt_lib
+  include/non_constrained_optimiztion/type.hpp
+  include/non_constrained_optimiztion/gradient_problem_options.hpp
+  ${ncopt_src})
+target_link_libraries(ncopt_lib
+  glog
+  ${PYTHON_LIBRARIES})
 
-MESSAGE(STATUS "yt:=  " ${catkin_INCLUDE_DIRS})
+add_library(path_smoothing
+  include/path_smoothing/path_smoothing.hpp
+  include/path_smoothing/distance_function.hpp
+  src/path_smoothing/cg_smoothing_function.cpp
+  src/path_smoothing/path_smoothing.cpp)
+target_link_libraries(path_smoothing
+  ncopt_lib
+  ${CASADI_LIBRARIES}
+  gpmp2
+  ${CERES_LIBRARIES}
+  ${catkin_LIBRARIES})
 
-add_library(${PROJECT_NAME}
-  src/cg_solver.cpp
-  src/path_smoothing.cpp)
-target_link_libraries(${PROJECT_NAME}
-  ${CERES_LIBRARIES})
+add_subdirectory(demo)
 
-add_executable(${PROJECT_NAME}_node
-  src/drivable_region_node.cpp)
-add_dependencies(${PROJECT_NAME}_node  ${PROJECT_NAME}_gencfg)
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBRARIES}
-        ${PROJECT_NAME})
 
 
