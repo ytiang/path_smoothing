@@ -14,9 +14,6 @@ PathSmoothing *PathSmoothing::createSmoother(const Options &options,
         case CONJUGATE_GRADIENT_METHOD: {
             return new CgSmoothing(options, path);
         }
-        case NON_DERIVATIVE_METHOS: {
-            return new NonDerivativeSmoothing(options, path);
-        }
         case GAUSS_PROCESS_METHOD: {
 #ifdef GPMP2_SMOOTHING_ENABLE
             return new GpSmoothing(options, path);
@@ -68,11 +65,7 @@ CgSmoothing::CgSmoothing(const Options &options,
     settings_.function_ = options.function;
 
     params_.resize(settings_.param_num);
-    convertToVector(path);
-}
 
-template<class PathElemetent>
-void CgSmoothing::convertToVector(const std::vector<PathElemetent> &path) {
     for (int i(1); i < path.size() - 1; ++i) {
         const int j = i - 1;
         params_(j * settings_.degree) = path.at(i).x;
@@ -80,14 +73,15 @@ void CgSmoothing::convertToVector(const std::vector<PathElemetent> &path) {
     }
 }
 
-template<>
-void CgSmoothing::convertToVector<hmpl::CircleNodePtr>(const std::vector<hmpl::CircleNodePtr> &path) {
-    for (int i(1); i < path.size() - 1; ++i) {
-        const int j = i - 1;
-        params_(j * settings_.degree) = path.at(i)->circle.position.x;
-        params_(j * settings_.degree + 1) = path.at(i)->circle.position.y;
-    }
-}
+//template<class PathElemetent>
+//void CgSmoothing::convertToVector(const std::vector<PathElemetent> &path) {
+//    for (int i(1); i < path.size() - 1; ++i) {
+//        const int j = i - 1;
+//        params_(j * settings_.degree) = path.at(i).x;
+//        params_(j * settings_.degree + 1) = path.at(i).y;
+//    }
+//}
+
 
 #ifdef GPMP2_SMOOTHING_ENABLE
 template<class PointType>

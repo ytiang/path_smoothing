@@ -13,7 +13,6 @@ set(catkin_deps
   rosparam_handler
   dynamic_reconfigure
   grid_map_core
-  opt_utils
   voronoi
   )
 
@@ -67,7 +66,7 @@ add_library(path_smoothing
   include/path_smoothing/distance_function.hpp
   src/path_smoothing/cg_smoothing_function.cpp
   src/path_smoothing/path_smoothing.cpp
-  src/path_smoothing/non_derivative_smoothing.cpp)
+  )
 target_link_libraries(path_smoothing
   ncopt_lib
   ${CASADI_LIBRARIES}

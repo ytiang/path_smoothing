@@ -16,27 +16,27 @@
 
 class DrivableMap {
  public:
-  explicit DrivableMap(const ros::NodeHandle &nh,
-                       const ros::NodeHandle &pnh);
-  std::vector<geometry_msgs::Point> rough_path;
+    explicit DrivableMap(const ros::NodeHandle &nh,
+                         const ros::NodeHandle &pnh);
+    std::vector<geometry_msgs::Point> rough_path;
  private:
-  void timerCb();
-  void reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
-                          uint32_t level);
-  path_smoothing::smoothing_demoParameters params_;
-  dynamic_reconfigure::Server<path_smoothing::smoothing_demoConfig> reconfig_;
-  ros::NodeHandle nh_;
-  ros::Timer timer_;
-  ros::Publisher original_path_pub_;
-  ros::Publisher smooth_path_pub_;
-  ros::Publisher smooth2_path_pub_;
-  ros::Publisher ogm_pub_;
-  ros::Publisher point_cloud_;
-  hmpl::InternalGridMap map_;
-  path_smoothing::PathSmoothing::Options options_;
-  double distance_threshold = 2.5;
-  std::string base_dir_;
-  std::string sdf_layer_ = "distance_cost";
+    void timerCb();
+    void reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
+                            uint32_t level);
+    path_smoothing::smoothing_demoParameters params_;
+    dynamic_reconfigure::Server<path_smoothing::smoothing_demoConfig> reconfig_;
+    ros::NodeHandle nh_;
+    ros::Timer timer_;
+    ros::Publisher original_path_pub_;
+    ros::Publisher smooth_path_pub_;
+    ros::Publisher smooth2_path_pub_;
+    ros::Publisher ogm_pub_;
+    ros::Publisher point_cloud_;
+    hmpl::InternalGridMap map_;
+    path_smoothing::PathSmoothing::Options options_;
+    double distance_threshold = 2.5;
+    std::string base_dir_;
+    std::string sdf_layer_ = "distance_cost";
 };
 
 DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
@@ -183,8 +183,9 @@ void DrivableMap::timerCb() {
     original_path_pub_.publish(original_path);
 
     using namespace path_smoothing;
-
-    DistanceFunction2D dis_function(map_.maps, sdf_layer_, distance_threshold);
+    VoronoiDiagram voronoi(map_.maps, 3);
+    DistanceFunction2D
+            dis_function(map_.maps, sdf_layer_, distance_threshold, voronoi);
     options_.function = &(dis_function);
 //    options_.cg_solver = SELF_SOLVER;
 
