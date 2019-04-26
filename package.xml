@@ -27,6 +27,7 @@
   <depend>rosparam_handler</depend>
   <depend>dynamic_reconfigure</depend>
   <depend>grid_map_core</depend>
+  <depend>voronoi</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

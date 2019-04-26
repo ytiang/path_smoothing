@@ -13,6 +13,8 @@ set(catkin_deps
   rosparam_handler
   dynamic_reconfigure
   grid_map_core
+  opt_utils
+  voronoi
   )
 
 find_package(catkin REQUIRED COMPONENTS
@@ -20,8 +22,8 @@ find_package(catkin REQUIRED COMPONENTS
 find_package(Ceres REQUIRED)
 find_package(casadi REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(gpmp2 QUIET)
-find_package(GTSAM QUIET)
+#find_package(gpmp2 QUIET)
+#find_package(GTSAM QUIET)
 
 find_package(PythonLibs 2.7 REQUIRED)
 
@@ -36,7 +38,7 @@ generate_ros_parameter_files(
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ${PROJECT_NAME} ncopt
+  LIBRARIES ${PROJECT_NAME} ncopt_lib
   CATKIN_DEPENDS ${catkin_deps}
   DEPENDS CERES CASADI EIGEN3
 )
@@ -64,11 +66,12 @@ add_library(path_smoothing
   include/path_smoothing/path_smoothing.hpp
   include/path_smoothing/distance_function.hpp
   src/path_smoothing/cg_smoothing_function.cpp
-  src/path_smoothing/path_smoothing.cpp)
+  src/path_smoothing/path_smoothing.cpp
+  src/path_smoothing/non_derivative_smoothing.cpp)
 target_link_libraries(path_smoothing
   ncopt_lib
   ${CASADI_LIBRARIES}
-  gpmp2
+  ${gpmp2_LIBRARIES}
   ${CERES_LIBRARIES}
   ${catkin_LIBRARIES})
 

@@ -17,6 +17,7 @@
 
 #include "path_smoothing/cg_smoothing_function.hpp"
 #include "non_constrained_optimiztion/gradient_problem_solve.hpp"
+#include <opt_utils/circle_node.hpp>
 
 namespace path_smoothing {
 
@@ -35,6 +36,10 @@ class PathSmoothing {
     double gp_vehicle_dynamic_sigma = 0.00;
     double gp_dt = 0.5;
     LeastSquaresSolver gp_solver = LEVENBERG_MARQUARDT;
+    // options for non-derivative method
+    double lower_boundary = 1.0;
+    double safe_margin = 0.2;
+    double max_curvature = 0.4;
 
     // options for signed distance field
     DistanceFunction2D *function = NULL;
@@ -68,8 +73,13 @@ class PathSmoothing {
 
 class CgSmoothing : public PathSmoothing {
  public:
-  template<class PointType>
-  CgSmoothing(const Options &options, const std::vector<PointType> &path);
+  template<class PathElemetent>
+  CgSmoothing(const Options &options, const std::vector<PathElemetent> &path);
+
+//  template<class PathElemetent>
+//  void convertToVector(const std::vector<PathElemetent> &path);
+  template<class PathElemetent>
+  void convertToVector(const std::vector<PathElemetent> &path);
 
   virtual double x(int i) const;
 
@@ -79,6 +89,49 @@ class CgSmoothing : public PathSmoothing {
  private:
   CgSmoothingFunction::Settings settings_;
   CgSmoothingFunction::Vector params_;
+};
+
+class NonDerivativeSmoothing : public PathSmoothing {
+ public:
+  NonDerivativeSmoothing(const Options &options,
+                         const std::vector<hmpl::CircleNode *> &circle_path);
+  virtual double x(int i) const;
+
+  virtual double y(int i) const;
+
+  virtual void smoothPath(const Options &options);
+
+  void optimizePathLength();
+
+  void optimizePath();
+
+  void optimizePathImproved();
+
+  void optimizeLength();
+
+  void updateCircleCenter(const hmpl::CircleRef parent,
+                          const hmpl::CircleRef first,
+                          hmpl::CirclePtr second,
+                          const hmpl::CircleRef third);
+
+  void updateCircleCenterWithoutLimit(const hmpl::CircleRef first,
+                                      hmpl::CirclePtr second,
+                                      const hmpl::CircleRef third);
+
+  double getLengthOfPath();
+  double getCirclePathEnergy();
+
+  double getSmoothness(hmpl::Vector2D<double> &first,
+                       hmpl::Vector2D<double> &second,
+                       hmpl::Vector2D<double> &third);
+
+  hmpl::Circle getPerpendicularCircle(
+          const hmpl::CircleRef first, const hmpl::CircleRef second,
+          const hmpl::CircleRef third);
+ private:
+  const std::vector<hmpl::CircleNode *> &circle_path_;
+  const DistanceFunction2D *distance_func_;
+  const Options options_;
 };
 
 #ifdef GPMP2_SMOOTHING_ENABLE

@@ -14,11 +14,15 @@ PathSmoothing *PathSmoothing::createSmoother(const Options &options,
         case CONJUGATE_GRADIENT_METHOD: {
             return new CgSmoothing(options, path);
         }
+        case NON_DERIVATIVE_METHOS: {
+            return new NonDerivativeSmoothing(options, path);
+        }
         case GAUSS_PROCESS_METHOD: {
 #ifdef GPMP2_SMOOTHING_ENABLE
             return new GpSmoothing(options, path);
 #else
-            LOG(ERROR) << "gpmp2 smoothing is not supported unless you have installed gtsam and gpmp2 libraries!!";
+            LOG(ERROR)
+                    << "gpmp2 smoothing is not supported unless you have installed gtsam and gpmp2 libraries!!";
             return new CgSmoothing(options, path);
 #endif
         }
@@ -47,9 +51,9 @@ void PathSmoothing::getPosePath(std::vector<PoseType> *path) {
     }
 }
 
-template<class PointType>
+template<class PathElemetent>
 CgSmoothing::CgSmoothing(const Options &options,
-                         const std::vector<PointType> &path)
+                         const std::vector<PathElemetent> &path)
         : PathSmoothing(path.size()) {
     settings_.heading_term_coe = options.cg_heading_term_coe;
     settings_.curvature_term_coe = options.cg_curvature_term_coe;
@@ -64,10 +68,24 @@ CgSmoothing::CgSmoothing(const Options &options,
     settings_.function_ = options.function;
 
     params_.resize(settings_.param_num);
+    convertToVector(path);
+}
+
+template<class PathElemetent>
+void CgSmoothing::convertToVector(const std::vector<PathElemetent> &path) {
     for (int i(1); i < path.size() - 1; ++i) {
         const int j = i - 1;
         params_(j * settings_.degree) = path.at(i).x;
         params_(j * settings_.degree + 1) = path.at(i).y;
+    }
+}
+
+template<>
+void CgSmoothing::convertToVector<hmpl::CircleNodePtr>(const std::vector<hmpl::CircleNodePtr> &path) {
+    for (int i(1); i < path.size() - 1; ++i) {
+        const int j = i - 1;
+        params_(j * settings_.degree) = path.at(i)->circle.position.x;
+        params_(j * settings_.degree + 1) = path.at(i)->circle.position.y;
     }
 }
 
