@@ -15,10 +15,12 @@
 #include "path_smoothing/obstacle_factor.hpp"
 #endif
 
-#include "path_smoothing/cg_smoothing_function.hpp"
-#include "non_constrained_optimiztion/gradient_problem_solve.hpp"
 #include <opt_utils/opt_utils.hpp>
 #include <geometry_msgs/PoseStamped.h>
+#include <tinyspline/tinysplinecpp.h>
+
+#include "path_smoothing/cg_smoothing_function.hpp"
+#include "non_constrained_optimiztion/gradient_problem_solve.hpp"
 
 namespace path_smoothing {
 
@@ -91,21 +93,7 @@ class PathSmoothing {
             const Options &options, const std::vector<PathElement> &path);
 
     template<class PathElement>
-    void getPointPath(std::vector<PathElement> *path);
-
-    template<class PoseType>
-    void getPosePath(std::vector<PoseType> *path);
-
-    template<class PathElement>
-    void getSmoothPath(std::vector<PathElement> *path) {
-        path->clear();
-        PathElement point;
-        for (int i(0); i < pathSize(); ++i) {
-            getX(point) = x(i);
-            getY(point) = y(i);
-            path->push_back(point);
-        }
-    }
+    void getSmoothPath(std::vector<PathElement> *path) const;
 
     inline const int &pathSize() const {
         return path_size_;
@@ -126,11 +114,6 @@ class CgSmoothing : public PathSmoothing {
 
     template<class PathElement>
     CgSmoothing(const Options &options, const std::vector<PathElement> &path);
-
-    CgSmoothing(const Options &options,
-                const ncopt::Vector &start,
-                const ncopt::Vector &end,
-                const CgSmoothingFunction::Vector &param);
 
     virtual double x(int i) const;
 
@@ -185,7 +168,7 @@ class NonDerivativeSmoothing : public PathSmoothing {
  private:
     std::vector<Circle> circle_path_;
     DistanceFunction2D *distance_func_;
-    const Options &options_;
+    double lower_boundary_;
 };
 
 #ifdef GPMP2_SMOOTHING_ENABLE

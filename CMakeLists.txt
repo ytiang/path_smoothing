@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(path_smoothing)
-set(CMAKE_BUILD_TYPE "Release")
+#set(CMAKE_BUILD_TYPE "Release")
 ## Compile as C++11, supported in ROS Kinetic and newer
 add_compile_options(-std=c++11)
 
@@ -14,7 +14,7 @@ set(catkin_deps
   dynamic_reconfigure
   grid_map_core
   voronoi
-  )
+  tinyspline)
 
 find_package(catkin REQUIRED COMPONENTS
   ${catkin_deps})

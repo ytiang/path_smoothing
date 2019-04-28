@@ -190,7 +190,7 @@ void DrivableMap::timerCb() {
 //    options_.cg_solver = SELF_SOLVER;
 
     /// conjugate-gradient smoothing:
-    options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
+    options_.smoother_type = NON_DERIVATIVE_METHOD;
     auto t1 = hmpl::now();
     std::unique_ptr<PathSmoothing>
             smoother(PathSmoothing::createSmoother(options_, rough_path));
@@ -198,7 +198,7 @@ void DrivableMap::timerCb() {
     auto t2 = hmpl::now();
     printf("cg smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
     std::vector<geometry_msgs::Point> path;
-    smoother->getPointPath(&path);
+    smoother->getSmoothPath(&path);
     for (const auto &state : path) {
         pose.pose.position.x = state.x;
         pose.pose.position.y = state.y;

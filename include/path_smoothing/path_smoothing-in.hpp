@@ -75,30 +75,33 @@ std::vector<hmpl::Circle> PathSmoothing::convertToCirclePath(
             circle_path.push_back(circle);
         }
     }
+    return circle_path;
 }
 
 template<class PathElement>
-void PathSmoothing::getPointPath(std::vector<PathElement> *path) {
+void PathSmoothing::getSmoothPath(std::vector<PathElement> *path) const {
     path->clear();
     PathElement point;
-    for (int i = 0; i < pathSize(); ++i) {
-        point.x = x(i);
-        point.y = y(i);
+    std::vector<double> ctrlp;
+    for (int i(0); i < pathSize(); ++i) {
+        ctrlp.push_back(x(i));
+        ctrlp.push_back(y(i));
+    }
+    size_t ctrlpt_num = ctrlp.size() / 2;
+    tinyspline::BSpline clamped_spline(ctrlpt_num);
+    clamped_spline.setControlPoints(ctrlp);
+
+    std::size_t sample_num = std::max((std::size_t) 100, ctrlpt_num * 5);
+    for (std::size_t j = 0; j < sample_num; j++) {
+        double size_f = static_cast<double>(sample_num - 1);
+        double knot_percent =
+                static_cast<double>(j) / size_f;  // range: [0, 1]
+
+        getX<double>(point) = clamped_spline.eval(knot_percent).result().at(0);
+        getY<double>(point) = clamped_spline.eval(knot_percent).result().at(1);
         path->push_back(point);
     }
 }
-
-template<class PoseType>
-void PathSmoothing::getPosePath(std::vector<PoseType> *path) {
-    path->clear();
-    PoseType pose;
-    for (int i = 0; i < pathSize(); ++i) {
-        pose.position.x = x(i);
-        pose.position.y = y(i);
-        path->push_back(pose);
-    }
-}
-
 #ifdef GPMP2_SMOOTHING_ENABLE
 template<class PathElement>
 GpSmoothing::GpSmoothing(const Options &options,

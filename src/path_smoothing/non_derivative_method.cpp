@@ -6,10 +6,10 @@ namespace path_smoothing {
 
 NonDerivativeSmoothing::NonDerivativeSmoothing(const Options &option,
                                                const std::vector<Circle> &circle_path)
-        : PathSmoothing(circle_path.size()),
-          circle_path_(circle_path),
-          options_(option) {
-    this->distance_func_ = options_.function;
+        : PathSmoothing(circle_path.size()) {
+    this->circle_path_ = circle_path;
+    this->distance_func_ = option.function;
+    this->lower_boundary_ = option.lower_boundary;
     CHECK(distance_func_ != nullptr)
     << "non-derivative method requires an distance funcion!";
 
@@ -56,7 +56,7 @@ void NonDerivativeSmoothing::updateCircleCenter(const CircleRef parent,
                                                     first.position,
                                                     second->position);
 //        if (clearance > second->r || clearance > options_.lower_boundary + 0.8) {
-        if (clearance > options_.lower_boundary && curvature <= curvature_new) {
+        if (clearance > this->lower_boundary_ && curvature <= curvature_new) {
             *second = perpendicular;
         } else {
             perpendicular.position.x =
@@ -77,7 +77,7 @@ void NonDerivativeSmoothing::updateCircleCenterWithoutLimit(
                                perpendicular.position.y);
         double clearance = this->distance_func_->getObstacleDistance(pos);
         if (clearance > second->r
-                || clearance > options_.lower_boundary + 0.8) {
+                || clearance > this->lower_boundary_ + 0.8) {
 //        if (clearance > this->lower_boundary_ + safety_margin_) {
             *second = perpendicular;
         } else {

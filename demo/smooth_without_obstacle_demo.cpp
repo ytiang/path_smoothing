@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     smoother->smoothPath(options);
     auto t2 = hmpl::now();
     printf("smooth time: %f\n", hmpl::getDurationInSecs(t1, t2));
-    smoother->getPointPath(&path);
+    smoother->getSmoothPath(&path);
 
 
     // write to file:
