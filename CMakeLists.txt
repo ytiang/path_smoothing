@@ -66,6 +66,7 @@ add_library(path_smoothing
   include/path_smoothing/distance_function.hpp
   src/path_smoothing/cg_smoothing_function.cpp
   src/path_smoothing/path_smoothing.cpp
+  src/path_smoothing/non_derivative_method.cpp
   )
 target_link_libraries(path_smoothing
   ncopt_lib

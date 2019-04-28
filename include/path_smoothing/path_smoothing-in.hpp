@@ -4,15 +4,21 @@
 
 #ifndef PATH_SMOOTHING_PATH_SMOOTHING_IN_HPP
 #define PATH_SMOOTHING_PATH_SMOOTHING_IN_HPP
+
 namespace path_smoothing {
 
-template<class PointType>
+template<class PathElement>
 PathSmoothing *PathSmoothing::createSmoother(const Options &options,
-                                             const std::vector<PointType> &path) {
+                                             const std::vector<PathElement> &path) {
     CHECK_GT(path.size(), 2) << "path contains less than 3 points!";
     switch (options.smoother_type) {
         case CONJUGATE_GRADIENT_METHOD: {
             return new CgSmoothing(options, path);
+        }
+        case NON_DERIVATIVE_METHOD: {
+            return new NonDerivativeSmoothing(options,
+                                              convertToCirclePath(options,
+                                                                  path));
         }
         case GAUSS_PROCESS_METHOD: {
 #ifdef GPMP2_SMOOTHING_ENABLE
@@ -20,16 +26,61 @@ PathSmoothing *PathSmoothing::createSmoother(const Options &options,
 #else
             LOG(ERROR)
                     << "gpmp2 smoothing is not supported unless you have installed gtsam and gpmp2 libraries!!";
-            return new CgSmoothing(options, path);
+            return nullptr;
 #endif
         }
     }
 }
 
-template<class PointType>
-void PathSmoothing::getPointPath(std::vector<PointType> *path) {
+template<class PathElement>
+CgSmoothing::CgSmoothing(const Options &options,
+                         const std::vector<PathElement> &path)
+        : PathSmoothing(path.size()) {
+    settings_.heading_term_coe = options.cg_heading_term_coe;
+    settings_.curvature_term_coe = options.cg_curvature_term_coe;
+    settings_.obstacle_term_coe = options.cg_obstacle_term_coe;
+    settings_.type = options.cg_difference_type;
+    settings_.degree = 2;
+    settings_.param_num = (path.size() - 2) * settings_.degree;
+    settings_.start.resize(settings_.degree);
+    settings_.start << getX<double>(path.front()), getY<double>(path.front());
+    settings_.end.resize(settings_.degree);
+    settings_.end << getX<double>(path.back()), getY<double>(path.back());
+    settings_.function_ = options.function;
+
+    params_.resize(settings_.param_num);
+    for (int i(1); i < path.size() - 1; ++i) {
+        const int j = i - 1;
+        params_(j * settings_.degree) = getX<double>(path.at(i));
+        params_(j * settings_.degree + 1) = getY<double>(path.at(i));
+    }
+}
+
+template<class PathElement>
+std::vector<hmpl::Circle> PathSmoothing::convertToCirclePath(
+        const Options &options, const std::vector<PathElement> &path) {
+    DistanceFunction2D *distance_func = options.function;
+    std::vector<hmpl::Circle> circle_path;
+    hmpl::Circle circle;
+    for (int i(0); i < path.size(); ++i) {
+        grid_map::Position
+                pos(getX<double>(path.at(i)), getY<double>(path.at(i)));
+        circle.position.x = pos(0);
+        circle.position.y = pos(1);
+        circle.r = distance_func->getObstacleDistance(pos);
+        if (circle_path.empty()) {
+            circle_path.push_back(circle);
+        } else if (circle_path.back().position.Distance(circle.position)
+                >= circle_path.back().r) {
+            circle_path.push_back(circle);
+        }
+    }
+}
+
+template<class PathElement>
+void PathSmoothing::getPointPath(std::vector<PathElement> *path) {
     path->clear();
-    PointType point;
+    PathElement point;
     for (int i = 0; i < pathSize(); ++i) {
         point.x = x(i);
         point.y = y(i);
@@ -48,45 +99,10 @@ void PathSmoothing::getPosePath(std::vector<PoseType> *path) {
     }
 }
 
-template<class PathElemetent>
-CgSmoothing::CgSmoothing(const Options &options,
-                         const std::vector<PathElemetent> &path)
-        : PathSmoothing(path.size()) {
-    settings_.heading_term_coe = options.cg_heading_term_coe;
-    settings_.curvature_term_coe = options.cg_curvature_term_coe;
-    settings_.obstacle_term_coe = options.cg_obstacle_term_coe;
-    settings_.type = options.cg_difference_type;
-    settings_.degree = 2;
-    settings_.param_num = (path.size() - 2) * settings_.degree;
-    settings_.start.resize(settings_.degree);
-    settings_.start << path.front().x, path.front().y;
-    settings_.end.resize(settings_.degree);
-    settings_.end << path.back().x, path.back().y;
-    settings_.function_ = options.function;
-
-    params_.resize(settings_.param_num);
-
-    for (int i(1); i < path.size() - 1; ++i) {
-        const int j = i - 1;
-        params_(j * settings_.degree) = path.at(i).x;
-        params_(j * settings_.degree + 1) = path.at(i).y;
-    }
-}
-
-//template<class PathElemetent>
-//void CgSmoothing::convertToVector(const std::vector<PathElemetent> &path) {
-//    for (int i(1); i < path.size() - 1; ++i) {
-//        const int j = i - 1;
-//        params_(j * settings_.degree) = path.at(i).x;
-//        params_(j * settings_.degree + 1) = path.at(i).y;
-//    }
-//}
-
-
 #ifdef GPMP2_SMOOTHING_ENABLE
-template<class PointType>
+template<class PathElement>
 GpSmoothing::GpSmoothing(const Options &options,
-                         const std::vector<PointType> &path)
+                         const std::vector<PathElement> &path)
         : PathSmoothing(path.size()) {
     // set robot model
     gtsam::Vector3 zero_vec(0.0, 0.0, 0.0);
@@ -102,8 +118,8 @@ GpSmoothing::GpSmoothing(const Options &options,
     auto vel_fix = gtsam::noiseModel::Isotropic::Sigma(robot.dof(), 1e-5);
 
     gtsam::Vector avg_vel(3);
-    avg_vel << path.back().x - path.front().x,
-            path.back().y - path.front().y, 0;
+    avg_vel << getX<double>(path.back()) - getX<double>(path.front()),
+            getY(path.back()) - getY(path.front()), 0;
     avg_vel = avg_vel / pathSize();
 
     //set initial values and build graph
@@ -112,13 +128,13 @@ GpSmoothing::GpSmoothing(const Options &options,
         gtsam::Key vel_key = i + pathSize();
         double heading;
         if (i == pathSize() - 1) {
-            heading = atan2(path.at(i).y - path.at(i - 2).y,
-                            path.at(i).x - path.at(i - 2).x);
+            heading = atan2(getY<double>(path.at(i)) - getY<double>(path.at(i - 2)),
+                            getX<double>(path.at(i)) - getX<double>(path.at(i - 2)));
         } else {
-            heading = atan2(path.at(i + 1).y - path.at(i).y,
-                            path.at(i + 1).x - path.at(i).x);
+            heading = atan2(getY<double>(path.at(i + 1)) - getY<double>(path.at(i)),
+                            getX<double>(path.at(i + 1)) - getX<double>(path.at(i)));
         }
-        gtsam::Pose2 current_pose(path.at(i).x, path.at(i).y, heading);
+        gtsam::Pose2 current_pose(getX<double>(path.at(i)), getY<double>(path.at(i)), heading);
         initial_guess.insert(pose_key, current_pose);
         initial_guess.insert(vel_key, avg_vel);
         // start and goal fix factor

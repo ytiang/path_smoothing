@@ -16,6 +16,7 @@
 enum SmootherType {
   CONJUGATE_GRADIENT_METHOD,
   GAUSS_PROCESS_METHOD,
+  NON_DERIVATIVE_METHOD,
 };
 enum DifferenceType {
   CPPAD,

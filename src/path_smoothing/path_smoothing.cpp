@@ -7,6 +7,67 @@
 
 namespace path_smoothing {
 
+template<>
+double &PathSmoothing::getX(geometry_msgs::Pose &point) {
+    return point.position.x;
+}
+
+template<>
+double &PathSmoothing::getX(hmpl::Circle &point) {
+    return point.position.x;
+}
+
+template<>
+double &PathSmoothing::getY(geometry_msgs::Pose &point) {
+    return point.position.y;
+}
+
+template<>
+double &PathSmoothing::getY(hmpl::Circle &point) {
+    return point.position.y;
+}
+
+template<>
+const double &PathSmoothing::getX(const geometry_msgs::Pose &point) {
+    return point.position.x;
+}
+
+template<>
+const double &PathSmoothing::getX(const hmpl::Circle &point) {
+    return point.position.x;
+}
+
+template<>
+const double &PathSmoothing::getY(const geometry_msgs::Pose &point) {
+    return point.position.y;
+}
+
+template<>
+const double &PathSmoothing::getY(const hmpl::Circle &point) {
+    return point.position.y;
+}
+
+PathSmoothing::PathSmoothing(const int path_size) : path_size_(path_size) {
+
+}
+
+CgSmoothing::CgSmoothing(const Options &options,
+                         const ncopt::Vector &start,
+                         const ncopt::Vector &end,
+                         const CgSmoothingFunction::Vector &param)
+        : params_(param),
+          PathSmoothing(param.rows() / 2 + 2) {
+    settings_.heading_term_coe = options.cg_heading_term_coe;
+    settings_.curvature_term_coe = options.cg_curvature_term_coe;
+    settings_.obstacle_term_coe = options.cg_obstacle_term_coe;
+    settings_.type = options.cg_difference_type;
+    settings_.degree = 2;
+    settings_.param_num = param.rows();
+    settings_.start = start;
+    settings_.end = end;
+    settings_.function_ = options.function;
+}
+
 void CgSmoothing::smoothPath(const Options &options) {
     CgSmoothingFunction *smooth_function =
             CgSmoothingFunction::createCgSmoothingFunction(settings_,
@@ -60,6 +121,10 @@ double CgSmoothing::y(int i) const {
     } else if (i == pathSize() - 1) {
         return settings_.end(1);
     }
+}
+
+void NonDerivativeSmoothing::smoothPath(const Options &options) {
+    this->optimizePathLength();
 }
 
 #ifdef GPMP2_SMOOTHING_ENABLE
