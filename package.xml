@@ -28,7 +28,7 @@
   <depend>dynamic_reconfigure</depend>
   <depend>grid_map_core</depend>
   <depend>voronoi</depend>
-  <depend>tinyspline</depend>
+  <depend>tinyspline_ros</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

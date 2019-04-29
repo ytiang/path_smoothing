@@ -17,7 +17,7 @@
 
 #include <opt_utils/opt_utils.hpp>
 #include <geometry_msgs/PoseStamped.h>
-#include <tinyspline/tinysplinecpp.h>
+#include <tinyspline_ros/tinysplinecpp.h>
 
 #include "path_smoothing/cg_smoothing_function.hpp"
 #include "non_constrained_optimiztion/gradient_problem_solve.hpp"

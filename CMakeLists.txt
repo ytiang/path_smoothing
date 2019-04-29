@@ -14,7 +14,7 @@ set(catkin_deps
   dynamic_reconfigure
   grid_map_core
   voronoi
-  tinyspline)
+  tinyspline_ros)
 
 find_package(catkin REQUIRED COMPONENTS
   ${catkin_deps})
