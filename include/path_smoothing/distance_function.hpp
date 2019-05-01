@@ -26,10 +26,7 @@ class DistanceFunction2D {
         } else if (sdf_.exists(dis_layer_) && voronoi_.isValid()) {
             this->is_valid_ = true;
             LOG(INFO) << "use voronoi field.";
-        } else {
-            LOG(WARNING) << "distance function is invalid.";
         }
-
     }
 
     DistanceFunction2D()

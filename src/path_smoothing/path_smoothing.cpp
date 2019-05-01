@@ -8,42 +8,42 @@
 namespace path_smoothing {
 
 template<>
-double &PathSmoothing::getX(geometry_msgs::Pose &point) {
+double &xRef(geometry_msgs::Pose &point) {
     return point.position.x;
 }
 
 template<>
-double &PathSmoothing::getX(hmpl::Circle &point) {
+double &xRef(hmpl::Circle &point) {
     return point.position.x;
 }
 
 template<>
-double &PathSmoothing::getY(geometry_msgs::Pose &point) {
+double &yRef(geometry_msgs::Pose &point) {
     return point.position.y;
 }
 
 template<>
-double &PathSmoothing::getY(hmpl::Circle &point) {
+double &yRef(hmpl::Circle &point) {
     return point.position.y;
 }
 
 template<>
-const double &PathSmoothing::getX(const geometry_msgs::Pose &point) {
+const double &xRef(const geometry_msgs::Pose &point) {
     return point.position.x;
 }
 
 template<>
-const double &PathSmoothing::getX(const hmpl::Circle &point) {
+const double &xRef(const hmpl::Circle &point) {
     return point.position.x;
 }
 
 template<>
-const double &PathSmoothing::getY(const geometry_msgs::Pose &point) {
+const double &yRef(const geometry_msgs::Pose &point) {
     return point.position.y;
 }
 
 template<>
-const double &PathSmoothing::getY(const hmpl::Circle &point) {
+const double &yRef(const hmpl::Circle &point) {
     return point.position.y;
 }
 

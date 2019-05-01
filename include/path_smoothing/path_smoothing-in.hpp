@@ -43,16 +43,16 @@ CgSmoothing::CgSmoothing(const Options &options,
     settings_.degree = 2;
     settings_.param_num = (path.size() - 2) * settings_.degree;
     settings_.start.resize(settings_.degree);
-    settings_.start << getX<double>(path.front()), getY<double>(path.front());
+    settings_.start << xRef<double>(path.front()), yRef<double>(path.front());
     settings_.end.resize(settings_.degree);
-    settings_.end << getX<double>(path.back()), getY<double>(path.back());
+    settings_.end << xRef<double>(path.back()), yRef<double>(path.back());
     settings_.function_ = options.function;
 
     params_.resize(settings_.param_num);
     for (int i(1); i < path.size() - 1; ++i) {
         const int j = i - 1;
-        params_(j * settings_.degree) = getX<double>(path.at(i));
-        params_(j * settings_.degree + 1) = getY<double>(path.at(i));
+        params_(j * settings_.degree) = xRef<double>(path.at(i));
+        params_(j * settings_.degree + 1) = yRef<double>(path.at(i));
     }
 }
 
@@ -64,7 +64,7 @@ std::vector<hmpl::Circle> PathSmoothing::convertToCirclePath(
     hmpl::Circle circle;
     for (int i(0); i < path.size(); ++i) {
         grid_map::Position
-                pos(getX<double>(path.at(i)), getY<double>(path.at(i)));
+                pos(xRef<double>(path.at(i)), yRef<double>(path.at(i)));
         circle.position.x = pos(0);
         circle.position.y = pos(1);
         circle.r = distance_func->getObstacleDistance(pos);
@@ -97,8 +97,8 @@ void PathSmoothing::getSmoothPath(std::vector<PathElement> *path) const {
         double knot_percent =
                 static_cast<double>(j) / size_f;  // range: [0, 1]
 
-        getX<double>(point) = clamped_spline.eval(knot_percent).result().at(0);
-        getY<double>(point) = clamped_spline.eval(knot_percent).result().at(1);
+        xRef<double>(point) = clamped_spline.eval(knot_percent).result().at(0);
+        yRef<double>(point) = clamped_spline.eval(knot_percent).result().at(1);
         path->push_back(point);
     }
 }
@@ -121,8 +121,8 @@ GpSmoothing::GpSmoothing(const Options &options,
     auto vel_fix = gtsam::noiseModel::Isotropic::Sigma(robot.dof(), 1e-5);
 
     gtsam::Vector avg_vel(3);
-    avg_vel << getX<double>(path.back()) - getX<double>(path.front()),
-            getY(path.back()) - getY(path.front()), 0;
+    avg_vel << xRef<double>(path.back()) - xRef<double>(path.front()),
+            yRef(path.back()) - yRef(path.front()), 0;
     avg_vel = avg_vel / pathSize();
 
     //set initial values and build graph
@@ -131,13 +131,13 @@ GpSmoothing::GpSmoothing(const Options &options,
         gtsam::Key vel_key = i + pathSize();
         double heading;
         if (i == pathSize() - 1) {
-            heading = atan2(getY<double>(path.at(i)) - getY<double>(path.at(i - 2)),
-                            getX<double>(path.at(i)) - getX<double>(path.at(i - 2)));
+            heading = atan2(yRef<double>(path.at(i)) - yRef<double>(path.at(i - 2)),
+                            xRef<double>(path.at(i)) - xRef<double>(path.at(i - 2)));
         } else {
-            heading = atan2(getY<double>(path.at(i + 1)) - getY<double>(path.at(i)),
-                            getX<double>(path.at(i + 1)) - getX<double>(path.at(i)));
+            heading = atan2(yRef<double>(path.at(i + 1)) - yRef<double>(path.at(i)),
+                            xRef<double>(path.at(i + 1)) - xRef<double>(path.at(i)));
         }
-        gtsam::Pose2 current_pose(getX<double>(path.at(i)), getY<double>(path.at(i)), heading);
+        gtsam::Pose2 current_pose(xRef<double>(path.at(i)), yRef<double>(path.at(i)), heading);
         initial_guess.insert(pose_key, current_pose);
         initial_guess.insert(vel_key, avg_vel);
         // start and goal fix factor

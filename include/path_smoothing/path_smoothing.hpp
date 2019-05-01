@@ -24,6 +24,55 @@
 
 namespace path_smoothing {
 
+/**
+ * static method for access the x value of a Point
+ * @tparam ReturnType requires basic type, like double , int
+ * @tparam PathElement requires point type containing x value and y value
+ * @param point
+ * @return the reference of x value of input point
+ */
+template<class ReturnType, class PathElement>
+ReturnType &xRef(PathElement &point) {
+    return point.x;
+}
+
+template<class ReturnType, class PathElement>
+const ReturnType &xRef(const PathElement &point) {
+    return point.x;
+}
+template<>
+double &xRef(geometry_msgs::Pose &point);
+template<>
+double &xRef(hmpl::Circle &point);
+template<>
+const double &xRef(const geometry_msgs::Pose &point);
+template<>
+const double &xRef(const hmpl::Circle &point);
+
+/**
+ * static method for access the y value of a Point
+ * @tparam ReturnType requires basic type, like double , int
+ * @tparam PathElement requires point type containing x value and y value
+ * @param point
+ * @return the reference of y value of input point
+ */
+template<class ReturnType, class PathElement>
+ReturnType &yRef(PathElement &point) {
+    return point.y;
+}
+template<class ReturnType, class PathElement>
+const ReturnType &yRef(const PathElement &point) {
+    return point.y;
+}
+template<>
+const double &yRef(const geometry_msgs::Pose &point);
+template<>
+const double &yRef(const hmpl::Circle &point);
+template<>
+double &yRef(geometry_msgs::Pose &point);
+template<>
+double &yRef(hmpl::Circle &point);
+
 class PathSmoothing {
  public:
     struct Options {
@@ -49,40 +98,6 @@ class PathSmoothing {
     };
 
     PathSmoothing(const int path_size);
-
-    /**
-     * static method for access the x value of a Point
-     * @tparam ReturnType requires basic type, like double , int
-     * @tparam PathElement requires point type containing x value and y value
-     * @param point
-     * @return the reference of x value of input point
-     */
-    template<class ReturnType, class PathElement>
-    static ReturnType &getX(PathElement &point) {
-        return point.x;
-    }
-
-    template<class ReturnType, class PathElement>
-    static const ReturnType &getX(const PathElement &point) {
-        return point.x;
-    }
-
-    /**
-     * static method for access the y value of a Point
-     * @tparam ReturnType requires basic type, like double , int
-     * @tparam PathElement requires point type containing x value and y value
-     * @param point
-     * @return the reference of y value of input point
-     */
-    template<class ReturnType, class PathElement>
-    static ReturnType &getY(PathElement &point) {
-        return point.y;
-    }
-
-    template<class ReturnType, class PathElement>
-    static const ReturnType &getY(const PathElement &point) {
-        return point.y;
-    }
 
     template<class PathElement>
     static PathSmoothing *createSmoother(const Options &options,
