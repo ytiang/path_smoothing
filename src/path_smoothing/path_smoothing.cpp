@@ -72,7 +72,7 @@ void CgSmoothing::smoothPath(const Options &options) {
                     ceres::NONLINEAR_CONJUGATE_GRADIENT;//ceres::STEEPEST_DESCENT; //
             option.max_num_iterations = 20;
             ceres::Solve(option, problem, params_.data(), &summary);
-            std::cout << summary.FullReport();
+//            std::cout << summary.FullReport();
             break;
         }
         case SELF_SOLVER: {
