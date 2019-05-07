@@ -25,7 +25,7 @@ PathSmoothing *PathSmoothing::createSmoother(const Options &options,
             return new GpSmoothing(options, path);
 #else
             LOG(ERROR)
-                    << "gpmp2 smoothing is not supported unless you have installed gtsam and gpmp2 libraries!!";
+                << "gpmp2 smoothing is not supported unless you have installed gtsam and gpmp2 libraries!!";
             return nullptr;
 #endif
         }
@@ -35,7 +35,7 @@ PathSmoothing *PathSmoothing::createSmoother(const Options &options,
 template<class PathElement>
 CgSmoothing::CgSmoothing(const Options &options,
                          const std::vector<PathElement> &path)
-        : PathSmoothing(path.size()) {
+    : PathSmoothing(path.size()) {
     settings_.heading_term_coe = options.cg_heading_term_coe;
     settings_.curvature_term_coe = options.cg_curvature_term_coe;
     settings_.obstacle_term_coe = options.cg_obstacle_term_coe;
@@ -58,20 +58,20 @@ CgSmoothing::CgSmoothing(const Options &options,
 
 template<class PathElement>
 std::vector<hmpl::Circle> PathSmoothing::convertToCirclePath(
-        const Options &options, const std::vector<PathElement> &path) {
+    const Options &options, const std::vector<PathElement> &path) {
     DistanceFunction2D *distance_func = options.function;
     std::vector<hmpl::Circle> circle_path;
     hmpl::Circle circle;
     for (int i(0); i < path.size(); ++i) {
         grid_map::Position
-                pos(xRef<double>(path.at(i)), yRef<double>(path.at(i)));
+            pos(xRef<double>(path.at(i)), yRef<double>(path.at(i)));
         circle.position.x = pos(0);
         circle.position.y = pos(1);
         circle.r = distance_func->getObstacleDistance(pos);
         if (circle_path.empty()) {
             circle_path.push_back(circle);
         } else if (circle_path.back().position.Distance(circle.position)
-                >= circle_path.back().r) {
+            >= 2.0) {
             circle_path.push_back(circle);
         }
     }
@@ -95,7 +95,7 @@ void PathSmoothing::getSmoothPath(std::vector<PathElement> *path) const {
     for (std::size_t j = 0; j < sample_num; j++) {
         double size_f = static_cast<double>(sample_num - 1);
         double knot_percent =
-                static_cast<double>(j) / size_f;  // range: [0, 1]
+            static_cast<double>(j) / size_f;  // range: [0, 1]
 
         xRef<double>(point) = clamped_spline.eval(knot_percent).result().at(0);
         yRef<double>(point) = clamped_spline.eval(knot_percent).result().at(1);
