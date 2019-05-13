@@ -83,12 +83,23 @@ void PathSmoothing::getSmoothPath(std::vector<PathElement> *path) const {
     path->clear();
     PathElement point;
     std::vector<double> ctrlp;
+    if (pathSize() < 4) {
+        LOG(WARNING)
+            << "path size is less than 4, failed interpolate with spline!";
+        for (int i(0); i < pathSize(); ++i) {
+            xRef<double>(point) = x(i);
+            yRef<double>(point) = y(i);
+            path->push_back(point);
+        }
+        return;
+    }
     for (int i(0); i < pathSize(); ++i) {
         ctrlp.push_back(x(i));
         ctrlp.push_back(y(i));
     }
     size_t ctrlpt_num = ctrlp.size() / 2;
-    tinyspline::BSpline clamped_spline(ctrlpt_num);
+    size_t degree = pathSize() > 7 ? 6 : pathSize() - 1;
+    tinyspline::BSpline clamped_spline(ctrlpt_num, 2, degree);
     clamped_spline.setControlPoints(ctrlp);
 
     std::size_t sample_num = std::max((std::size_t) 100, ctrlpt_num * 5);
