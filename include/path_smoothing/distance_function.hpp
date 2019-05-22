@@ -82,7 +82,12 @@ class DistanceFunction2D {
     inline double getObstacleDistance(const grid_map::Position &pt) const {
         CHECK(sdf_.exists(dis_layer_))
         << "grid map requires a layer named 'distance' to restore the obstacle distance!";
-        return sdf_.atPosition("distance", pt, interpolate_type);
+        if(sdf_.isInside(pt)) {
+            return sdf_.atPosition("distance", pt, interpolate_type);
+        } else {
+            return 0.0;
+        }
+
     }
 
  private:
