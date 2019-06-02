@@ -71,7 +71,7 @@ std::vector<hmpl::Circle> PathSmoothing::convertToCirclePath(
         if (circle_path.empty()) {
             circle_path.push_back(circle);
         } else if (circle_path.back().position.Distance(circle.position)
-            >= 2.0) {
+            >= 1.0) {
             circle_path.push_back(circle);
         }
     }
