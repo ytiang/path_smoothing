@@ -141,6 +141,7 @@ double NonDerivativeSmoothing::getCirclePathEnergy() const {
 
 void NonDerivativeSmoothing::optimizePathLength() {
     std::size_t size = this->circle_path_.size();
+    int count = 0;
     if (size > 3) {
         double length, new_length;
         do {
@@ -177,7 +178,8 @@ void NonDerivativeSmoothing::optimizePathLength() {
             if (new_length < length && improvement < 1e-5) {
                 break;
             }
-        } while (new_length < length);
+            count ++;
+        } while (new_length < length && count < 10);
     }
 }
 
