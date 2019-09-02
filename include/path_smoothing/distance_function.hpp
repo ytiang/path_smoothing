@@ -43,7 +43,7 @@ class DistanceFunction2D {
                                               pt,
                                               interpolate_type);
             if (dis <= 0) {
-                cost = th_ - dis;
+                cost = th_ - 2*dis;
             } else if (dis <= th_) {
                 cost = pow(dis - th_, 2) / th_;
             }

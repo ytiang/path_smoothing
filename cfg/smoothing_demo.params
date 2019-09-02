@@ -11,16 +11,16 @@ gen.add("cg_curvature_term_coe", paramtype="double",
 gen.add("cg_obstacle_term_coe", paramtype="double", description="cg method coe",
         default=2.0, min=0.0, max=5.0, configurable=True)
 gen.add("gp_obs_sigma", paramtype="double", description="gp method coe",
-        default=0.03, min=0.0, max=1.0, configurable=True)
+        default=0.04, min=0.0, max=0.5, configurable=True)
 gen.add("gp_vehicle_dynamic_sigma", paramtype="double",
         description="gp method coe",
-        default=0.02, min=0.0, max=1.0, configurable=True)
+        default=0.65, min=0.0, max=1.0, configurable=True)
 gen.add("gp_dt", paramtype="double", description="gp method coe",
-        default=0.4, min=0.0, max=5.0, configurable=True)
+        default=1.35, min=0.0, max=5.0, configurable=True)
 gen.add("distance_threshold", paramtype="double", description="gp method coe",
         default=2.5, min=0.0, max=5, configurable=True)
 
-gen.add_enum("cg_solver_type", description="solver enum", entry_strings=["Ceres", "Self", "ddd", "ggg"], default="Self")
+gen.add_enum("cg_solver_type", description="solver enum", entry_strings=["Ceres", "Self"], default="Ceres")
 # Syntax : Package, Node, Config Name(The final name will be MyDummyConfig)
 exit(gen.generate("path_smoothing", "path_smoothing_demo_node",
                   "smoothing_demo"))
