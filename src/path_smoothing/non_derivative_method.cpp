@@ -15,26 +15,26 @@ NonDerivativeSmoothing::NonDerivativeSmoothing(const Options &option,
 
 }
 
-hmpl::Circle NonDerivativeSmoothing::getPerpendicularCircle(const CircleRef first,
+Circle NonDerivativeSmoothing::getPerpendicularCircle(const CircleRef first,
                                                             const CircleRef second,
                                                             const CircleRef third) {
     Circle c;
     double t = 0;
-    double x1 = first.position.x;
-    double y1 = first.position.y;
-    double x2 = second.position.x;
-    double y2 = second.position.y;
-    double x3 = third.position.x;
-    double y3 = third.position.y;
+    double x1 = first.center.x;
+    double y1 = first.center.y;
+    double x2 = second.center.x;
+    double y2 = second.center.y;
+    double x3 = third.center.x;
+    double y3 = third.center.y;
 
     // parameterize the point between the start point and the end point
     double a = (x3 - x1) * (x1 - x2) + (y3 - y1) * (y1 - y2);
     double b = pow(y3 - y1, 2.0) + pow(x3 - x1, 2.0);
     t = -a / b;
     // perpendicular point
-    c.position.x = x1 * (1 - t) + x3 * t;
-    c.position.y = y1 * (1 - t) + y3 * t;
-    grid_map::Position pos(c.position.x, c.position.y);
+    c.center.x = x1 * (1 - t) + x3 * t;
+    c.center.y = y1 * (1 - t) + y3 * t;
+    grid_map::Position pos(c.center.x, c.center.y);
     c.r = this->distance_func_->getObstacleDistance(pos);
 
     return c;
@@ -45,24 +45,24 @@ void NonDerivativeSmoothing::updateCircleCenter(const CircleRef parent,
                                                 CirclePtr second,
                                                 const CircleRef third) {
     Circle perpendicular = getPerpendicularCircle(first, *second, third);
-    while (second->position.Distance(perpendicular.position) > 0.00001) {
-        grid_map::Position pos(perpendicular.position.x,
-                               perpendicular.position.y);
+    while (second->center.Distance(perpendicular.center) > 0.00001) {
+        grid_map::Position pos(perpendicular.center.x,
+                               perpendicular.center.y);
         double clearance = distance_func_->getObstacleDistance(pos);
-        const double curvature_new = hmpl::getCurvature(parent.position,
-                                                        first.position,
-                                                        perpendicular.position);
-        const double curvature = hmpl::getCurvature(parent.position,
-                                                    first.position,
-                                                    second->position);
+        const double curvature_new = hmpl::getCurvature(parent.center,
+                                                        first.center,
+                                                        perpendicular.center);
+        const double curvature = hmpl::getCurvature(parent.center,
+                                                    first.center,
+                                                    second->center);
 //        if (clearance > second->r || clearance > options_.lower_boundary + 0.8) {
         if (clearance > this->lower_boundary_ && curvature <= curvature_new) {
             *second = perpendicular;
         } else {
-            perpendicular.position.x =
-                    (perpendicular.position.x + second->position.x) / 2.0;
-            perpendicular.position.y =
-                    (perpendicular.position.y + second->position.y) / 2.0;
+            perpendicular.center.x =
+                    (perpendicular.center.x + second->center.x) / 2.0;
+            perpendicular.center.y =
+                    (perpendicular.center.y + second->center.y) / 2.0;
             perpendicular.r = clearance;
         }
     }
@@ -72,19 +72,19 @@ void NonDerivativeSmoothing::updateCircleCenterWithoutLimit(
         const CircleRef first, CirclePtr second,
         const CircleRef third) {
     Circle perpendicular = getPerpendicularCircle(first, *second, third);
-    while (second->position.Distance(perpendicular.position) > 1e-4) {
-        grid_map::Position pos(perpendicular.position.x,
-                               perpendicular.position.y);
+    while (second->center.Distance(perpendicular.center) > 1e-4) {
+        grid_map::Position pos(perpendicular.center.x,
+                               perpendicular.center.y);
         double clearance = this->distance_func_->getObstacleDistance(pos);
         if (clearance > second->r
                 || clearance > this->lower_boundary_ + 0.8) {
 //        if (clearance > this->lower_boundary_ + safety_margin_) {
             *second = perpendicular;
         } else {
-            perpendicular.position.x =
-                    (perpendicular.position.x + second->position.x) / 2.0;
-            perpendicular.position.y =
-                    (perpendicular.position.y + second->position.y) / 2.0;
+            perpendicular.center.x =
+                    (perpendicular.center.x + second->center.x) / 2.0;
+            perpendicular.center.y =
+                    (perpendicular.center.y + second->center.y) / 2.0;
             perpendicular.r = clearance;
         }
     }
@@ -95,10 +95,10 @@ double NonDerivativeSmoothing::getLengthOfPath() const {
     double length = 0;
     if (size > 1) {
         for (std::size_t i = 0; i < size - 2; i++) {
-            double x_1 = this->circle_path_.at(i).position.x;
-            double x_2 = this->circle_path_.at(i + 1).position.x;
-            double y_1 = this->circle_path_.at(i).position.y;
-            double y_2 = this->circle_path_.at(i + 1).position.y;
+            double x_1 = this->circle_path_.at(i).center.x;
+            double x_2 = this->circle_path_.at(i + 1).center.x;
+            double y_1 = this->circle_path_.at(i).center.y;
+            double y_2 = this->circle_path_.at(i + 1).center.y;
             double delta = std::sqrt(
                     (x_1 - x_2) * (x_1 - x_2) + (y_1 - y_2) * (y_1 - y_2));
             length += delta;
@@ -124,11 +124,11 @@ double NonDerivativeSmoothing::getCirclePathEnergy() const {
     double energy = 0;
     for (std::size_t i = 1; i < size - 2; i++) {
         const hmpl::Vector2D<double>
-                &first = this->circle_path_.at(i - 1).position;
+                &first = this->circle_path_.at(i - 1).center;
         const hmpl::Vector2D<double>
-                &second = this->circle_path_.at(i).position;
+                &second = this->circle_path_.at(i).center;
         const hmpl::Vector2D<double>
-                &third = this->circle_path_.at(i + 1).position;
+                &third = this->circle_path_.at(i + 1).center;
 
         smoothness = hmpl::getCurvature(first, second, third);
         length = second.Distance(first) + third.Distance(second);

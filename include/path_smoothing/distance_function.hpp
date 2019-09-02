@@ -7,34 +7,27 @@
 
 #include <grid_map_core/GridMap.hpp>
 #include <glog/logging.h>
-#include <voronoi_diagram.hpp>
 
 class DistanceFunction2D {
  public:
     DistanceFunction2D(const grid_map::GridMap &map,
                        const std::string &sdf_layer_name,
-                       double threshold = 3.0,
-                       const VoronoiDiagram &voronoi = VoronoiDiagram())
-            : sdf_(map),
-              voronoi_(voronoi),
-              sdf_layer_(sdf_layer_name),
-              th_(threshold),
-              is_valid_(false) {
+                       double threshold = 3.0)
+        : sdf_(map),
+          sdf_layer_(sdf_layer_name),
+          th_(threshold),
+          is_valid_(false) {
         if (sdf_.exists(sdf_layer_name)) {
             this->is_valid_ = true;
             LOG(INFO) << "use signed distance field.";
-        } else if (sdf_.exists(dis_layer_) && voronoi_.isValid()) {
-            this->is_valid_ = true;
-            LOG(INFO) << "use voronoi field.";
         }
     }
 
     DistanceFunction2D()
-            : sdf_(grid_map::GridMap()),
-              sdf_layer_(""),
-              th_(0.0),
-              is_valid_(false),
-              voronoi_(VoronoiDiagram()) {
+        : sdf_(grid_map::GridMap()),
+          sdf_layer_(""),
+          th_(0.0),
+          is_valid_(false) {
 
     }
 
@@ -46,17 +39,13 @@ class DistanceFunction2D {
         const grid_map::Position pt(x, y);
         double cost = 0.0;
         if (sdf_.isInside(pt)) {
-            if (voronoi_.isValid()) {
-                cost = voronoi_.getPotential(sdf_, pt);
-            } else {
-                const auto &dis = sdf_.atPosition(sdf_layer_,
-                                                  pt,
-                                                  interpolate_type);
-                if (dis <= 0) {
-                    cost = th_ - dis;
-                } else if (dis <= th_) {
-                    cost = pow(dis - th_, 2) / th_;
-                }
+            const auto &dis = sdf_.atPosition(sdf_layer_,
+                                              pt,
+                                              interpolate_type);
+            if (dis <= 0) {
+                cost = th_ - dis;
+            } else if (dis <= th_) {
+                cost = pow(dis - th_, 2) / th_;
             }
         }
         return cost;
@@ -82,7 +71,7 @@ class DistanceFunction2D {
     inline double getObstacleDistance(const grid_map::Position &pt) const {
         CHECK(sdf_.exists(dis_layer_))
         << "grid map requires a layer named 'distance' to restore the obstacle distance!";
-        if(sdf_.isInside(pt)) {
+        if (sdf_.isInside(pt)) {
             return sdf_.atPosition("distance", pt, interpolate_type);
         } else {
             return 0.0;
@@ -96,9 +85,8 @@ class DistanceFunction2D {
     const std::string dis_layer_ = "distance";
     const std::string &sdf_layer_;
     const grid_map::GridMap &sdf_;
-    const VoronoiDiagram &voronoi_;
     const grid_map::InterpolationMethods
-            interpolate_type = grid_map::InterpolationMethods::INTER_LINEAR;
+        interpolate_type = grid_map::InterpolationMethods::INTER_LINEAR;
 };
 
 #endif //PATH_SMOOTHING_DISTANCE_FUNCTION_HPP

@@ -14,64 +14,13 @@
 #include <gpmp2/kinematics/Pose2MobileBaseModel.h>
 #include "path_smoothing/obstacle_factor.hpp"
 #endif
-
-#include <opt_utils/opt_utils.hpp>
-#include <geometry_msgs/PoseStamped.h>
-#include <tinyspline_ros/tinysplinecpp.h>
-
+#include <geometry_msgs/Point.h>
+#include "tiny_spline/tinysplinecpp.h"
 #include "path_smoothing/cg_smoothing_function.hpp"
 #include "non_constrained_optimiztion/gradient_problem_solve.hpp"
+//#include "path_smoothing_unit.hpp"
 
 namespace path_smoothing {
-
-/**
- * static method for access the x value of a Point
- * @tparam ReturnType requires basic type, like double , int
- * @tparam PathElement requires point type containing x value and y value
- * @param point
- * @return the reference of x value of input point
- */
-template<class ReturnType, class PathElement>
-ReturnType &xRef(PathElement &point) {
-    return point.x;
-}
-
-template<class ReturnType, class PathElement>
-const ReturnType &xRef(const PathElement &point) {
-    return point.x;
-}
-template<>
-double &xRef(geometry_msgs::Pose &point);
-template<>
-double &xRef(hmpl::Circle &point);
-template<>
-const double &xRef(const geometry_msgs::Pose &point);
-template<>
-const double &xRef(const hmpl::Circle &point);
-
-/**
- * static method for access the y value of a Point
- * @tparam ReturnType requires basic type, like double , int
- * @tparam PathElement requires point type containing x value and y value
- * @param point
- * @return the reference of y value of input point
- */
-template<class ReturnType, class PathElement>
-ReturnType &yRef(PathElement &point) {
-    return point.y;
-}
-template<class ReturnType, class PathElement>
-const ReturnType &yRef(const PathElement &point) {
-    return point.y;
-}
-template<>
-const double &yRef(const geometry_msgs::Pose &point);
-template<>
-const double &yRef(const hmpl::Circle &point);
-template<>
-double &yRef(geometry_msgs::Pose &point);
-template<>
-double &yRef(hmpl::Circle &point);
 
 class PathSmoothing {
  public:
@@ -99,16 +48,15 @@ class PathSmoothing {
 
     PathSmoothing(const int path_size);
 
-    template<class PathElement>
+//    template<class PathElement>
+//    static PathSmoothing *createSmoother(const Options &options,
+//                                         const std::vector<PathElement> &path);
     static PathSmoothing *createSmoother(const Options &options,
-                                         const std::vector<PathElement> &path);
+                                         const std::vector<geometry_msgs::Point> &path);
 
-    template<class PathElement>
-    static std::vector<hmpl::Circle> convertToCirclePath(
-            const Options &options, const std::vector<PathElement> &path);
-
-    template<class PathElement>
-    void getSmoothPath(std::vector<PathElement> *path) const;
+//    template<class PathElement>
+//    void getSmoothPath(std::vector<PathElement> *path) const;
+    void getSmoothPath(std::vector<geometry_msgs::Point> *path) const;
 
     inline const int &pathSize() const {
         return path_size_;
@@ -127,8 +75,10 @@ class PathSmoothing {
 class CgSmoothing : public PathSmoothing {
  public:
 
-    template<class PathElement>
-    CgSmoothing(const Options &options, const std::vector<PathElement> &path);
+//    template<class PathElement>
+//    CgSmoothing(const Options &options, const std::vector<PathElement> &path);
+    CgSmoothing(const Options &options,
+                const std::vector<geometry_msgs::Point> &path);
 
     virtual double x(int i) const;
 
@@ -140,72 +90,29 @@ class CgSmoothing : public PathSmoothing {
     CgSmoothingFunction::Vector params_;
 };
 
-class NonDerivativeSmoothing : public PathSmoothing {
- public:
-    typedef hmpl::Circle Circle;
-    typedef hmpl::Circle &CircleRef;
-    typedef hmpl::Circle *CirclePtr;
-
-    NonDerivativeSmoothing(const Options &option,
-                           const std::vector<Circle> &circle_path);
-
-    void optimizePathLength();
-
-    void optimizePathImproved();
-
-    void updateCircleCenter(const CircleRef parent,
-                            const CircleRef first,
-                            CirclePtr second,
-                            const CircleRef third);
-
-    void updateCircleCenterWithoutLimit(const CircleRef first,
-                                        CirclePtr second,
-                                        const CircleRef third);
-
-    Circle getPerpendicularCircle(const CircleRef first,
-                                  const CircleRef second,
-                                  const CircleRef third);
-
-    double getLengthOfPath() const;
-
-    double getCirclePathEnergy() const;
-
-    void smoothPath(const Options &options);
-
-    virtual double x(int i) const {
-        return circle_path_.at(i).position.x;
-    }
-
-    virtual double y(int i) const {
-        return circle_path_.at(i).position.y;
-    }
-
- private:
-    std::vector<Circle> circle_path_;
-    DistanceFunction2D *distance_func_;
-    double lower_boundary_;
-};
-
 #ifdef GPMP2_SMOOTHING_ENABLE
 class GpSmoothing : public PathSmoothing {
  public:
-  template<class PathElement>
-  GpSmoothing(const Options &options, const std::vector<PathElement> &path);
+//  template<class PathElement>
+//  GpSmoothing(const Options &options, const std::vector<PathElement> &path);
 
-  virtual void smoothPath(const Options &options);
+    GpSmoothing(const Options &options,
+                const std::vector<geometry_msgs::Point> &path);
 
-  virtual double x(int i) const;
-  virtual double y(int i) const;
+    virtual void smoothPath(const Options &options);
+
+    virtual double x(int i) const;
+    virtual double y(int i) const;
 
  private:
-  gtsam::Values result_;
-  gtsam::Values initial_guess;
-  gtsam::NonlinearFactorGraph graph_;
+    gtsam::Values result_;
+    gtsam::Values initial_guess;
+    gtsam::NonlinearFactorGraph graph_;
 };
 #endif
 
 }
 
-#include "path_smoothing-in.hpp"
+//#include "path_smoothing-in.hpp"
 
 #endif //PATH_SMOOTHING_PATH_SMOOTHING_HPP

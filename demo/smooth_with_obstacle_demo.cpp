@@ -2,6 +2,8 @@
 // Created by yangt on 19-2-22.
 //
 #include <memory>
+#include <cv.hpp>
+
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <dynamic_reconfigure/server.h>
@@ -9,10 +11,11 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <grid_map_ros/GridMapRosConverter.hpp>
-#include "opt_utils/opt_utils.hpp"
+#include <grid_map_cv/GridMapCvConverter.hpp>
+
 #include "path_smoothing/path_smoothing.hpp"
 #include "path_smoothing/smoothing_demoParameters.h"
-#include "internal_grid_map/internal_grid_map.hpp"
+#include "csv_reader.hpp"
 
 class DrivableMap {
  public:
@@ -20,6 +23,8 @@ class DrivableMap {
                          const ros::NodeHandle &pnh);
     std::vector<geometry_msgs::Point> rough_path;
  private:
+    void initializeMap();
+    void showDistanceField(const DistanceFunction2D &dis_func);
     void timerCb();
     void reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
                             uint32_t level);
@@ -32,15 +37,20 @@ class DrivableMap {
     ros::Publisher smooth2_path_pub_;
     ros::Publisher ogm_pub_;
     ros::Publisher point_cloud_;
-    hmpl::InternalGridMap map_;
+    grid_map::GridMap map_;
     path_smoothing::PathSmoothing::Options options_;
-    double distance_threshold = 2.5;
+    double distance_threshold = 3.0;
     std::string base_dir_;
-    std::string sdf_layer_ = "distance_cost";
+    std::string sdf_layer_ = "singed_distance";
+    std::string obs_layer_ = "obstacle";
+    std::string dis_layer_ = "distance";
 };
 
 DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
-        : nh_(nh), reconfig_(pnh), params_(pnh), options_() {
+    : nh_(nh),
+      reconfig_(pnh),
+      params_(pnh),
+      options_() {
 
     printf(">>>> distance threshold: %f\n", distance_threshold);
     printf(">>>> curvature coe: %f\n", options_.cg_curvature_term_coe);
@@ -50,40 +60,12 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
     printf(">>>> gp obstacle sigma: %f\n", options_.gp_obs_sigma);
     printf(">>>> gp vehicle dynamic sigma: %f\n",
            options_.gp_vehicle_dynamic_sigma);
-    // init grid map
     base_dir_ = ros::package::getPath("path_smoothing");
-    cv::Mat img_src = cv::imread(base_dir_ + "/demo/obstacles.png", CV_8UC1);
-    double resolution = 0.1;  // in meter
 
-    map_.initializeFromImage(img_src,
-                             resolution,
-                             grid_map::Position::Zero());
-    map_.maps.setFrameId("map");
-    map_.addObstacleLayerFromImage(img_src, 0.5);
-    map_.maps.add(sdf_layer_, 0.0);
-    map_.updateDistanceLayerCV();
-    hmpl::InternalGridMap inveres_map;
-    inveres_map.init(map_.maps.getFrameId(),
-                     map_.maps.getLength(),
-                     map_.maps.getResolution());
-    for (grid_map::GridMapIterator it(inveres_map.maps); !it.isPastEnd();
-         ++it) {
-        const auto &value = map_.maps.at(map_.obs, *it);
-        if (value >= map_.FREE / 2) {
-            inveres_map.maps.at(map_.obs, *it) = map_.OCCUPY;
-        } else {
-            inveres_map.maps.at(map_.obs, *it) = map_.FREE;
-        }
-    }
-    inveres_map.updateDistanceLayerCV();
-    for (grid_map::GridMapIterator it(inveres_map.maps); !it.isPastEnd();
-         ++it) {
-        const auto cost = map_.maps.at(map_.dis, *it)
-                - inveres_map.maps.at(map_.dis, *it);
-        map_.maps.at(sdf_layer_, *it) = cost;
-    }
-
-    io::CSVReader<2> in(base_dir_ + "/demo/a_star_path.csv");
+    // init grid map
+    this->initializeMap();
+    // read rough path:
+    io::CSVReader<2> in(base_dir_ + "/demo/rough_path.csv");
     in.read_header(io::ignore_extra_column, "x", "y");
     geometry_msgs::Point pt;
     while (in.read_row(pt.x, pt.y)) {
@@ -92,32 +74,78 @@ DrivableMap::DrivableMap(const ros::NodeHandle &nh, const ros::NodeHandle &pnh)
 
     // init ros subscriber and publisher
     this->original_path_pub_ = this->nh_.advertise<nav_msgs::Path>(
-            "original_path", 1, true);
+        "original_path", 1, true);
     this->smooth_path_pub_ = this->nh_.advertise<nav_msgs::Path>(
-            "cg_smooth_path", 1, true);
+        "cg_smooth_path", 1, true);
 
     this->smooth2_path_pub_ = this->nh_.advertise<nav_msgs::Path>(
-            "gp_smooth_path", 1, true);
+        "gp_smooth_path", 1, true);
 
     this->ogm_pub_ = this->nh_.advertise<nav_msgs::OccupancyGrid>(
-            "global_path/grid_map",
+        "global_path/grid_map",
+        1,
+        true);
+    this->point_cloud_ =
+        this->nh_.advertise<sensor_msgs::PointCloud2>(
+            "map_point_cloud",
             1,
             true);
-    this->point_cloud_ =
-            this->nh_.advertise<sensor_msgs::PointCloud2>(
-                    "map_point_cloud",
-                    1,
-                    true);
     this->timer_ =
-            this->nh_.createTimer(
-                    ros::Duration(1),
-                    boost::bind(&DrivableMap::timerCb, this));
+        this->nh_.createTimer(
+            ros::Duration(1),
+            boost::bind(&DrivableMap::timerCb, this));
 //    params_.fromParamServer();
     reconfig_.setCallback(boost::bind(&DrivableMap::reconfigureRequest,
                                       this,
                                       _1,
                                       _2));
 
+}
+
+void DrivableMap::initializeMap() {
+    cv::Mat img_src = cv::imread(base_dir_ + "/demo/obstacles.png", CV_8UC1);
+    cv::Mat obs_dis, inverse_obs_dis;
+    cv::distanceTransform(img_src, obs_dis, CV_DIST_L2, CV_DIST_MASK_PRECISE);
+    cv::distanceTransform(~img_src,
+                          inverse_obs_dis,
+                          CV_DIST_L2,
+                          CV_DIST_MASK_PRECISE);
+    double resolution = 0.1;  // in meter
+    grid_map::GridMapCvConverter::initializeFromImage(img_src,
+                                                      resolution,
+                                                      this->map_,
+                                                      grid_map::Position::Zero());
+    this->map_.setFrameId("map");
+    grid_map::GridMapCvConverter::addLayerFromImage<unsigned char, 1>(img_src,
+                                                                      obs_layer_,
+                                                                      this->map_);
+    this->map_.add(dis_layer_);
+    this->map_.add(sdf_layer_);
+    for (grid_map::GridMapIterator it(map_); !it.isPastEnd(); ++it) {
+        const auto &dis = obs_dis.at<float>((*it)(0), (*it)(1));
+        const auto &inverse_dis = inverse_obs_dis.at<float>((*it)(0), (*it)(1));
+        this->map_.at(dis_layer_, *it) = dis * map_.getResolution();
+        this->map_.at(sdf_layer_, *it) = (dis - inverse_dis) * map_.getResolution();
+    }
+}
+
+void DrivableMap::showDistanceField(const DistanceFunction2D &dis_func) {
+    sensor_msgs::PointCloud2 pcl_msg;
+    grid_map::GridMap cost_map({"cost"});
+    cost_map.setGeometry(map_.getLength(),
+                         map_.getResolution(),
+                         map_.getPosition());
+    cost_map.setFrameId(map_.getFrameId());
+    for(grid_map::GridMapIterator it(cost_map); !it.isPastEnd(); ++it) {
+        grid_map::Position pos;
+        cost_map.getPosition(*it, pos);
+        cost_map.at("cost", *it) = dis_func.cost(pos(0), pos(1));
+    }
+    grid_map::GridMapRosConverter::toPointCloud(cost_map,
+                                                "cost",
+                                                pcl_msg);
+
+    this->point_cloud_.publish(pcl_msg);
 }
 
 void DrivableMap::reconfigureRequest(path_smoothing::smoothing_demoConfig &config,
@@ -152,25 +180,21 @@ void DrivableMap::reconfigureRequest(path_smoothing::smoothing_demoConfig &confi
 void DrivableMap::timerCb() {
 
     ros::Time time = ros::Time::now();
-    map_.maps.setTimestamp(time.toNSec());
+    this->map_.setTimestamp(time.toNSec());
+    //publish grid_map;
     nav_msgs::OccupancyGrid message;
-    grid_map::GridMapRosConverter::toOccupancyGrid(map_.maps,
-                                                   map_.obs,
-                                                   map_.FREE,
-                                                   map_.OCCUPY,
+    grid_map::GridMapRosConverter::toOccupancyGrid(map_,
+                                                   obs_layer_,
+                                                   1,
+                                                   0,
                                                    message);
     this->ogm_pub_.publish(message);
-    sensor_msgs::PointCloud2 pointcloud;
-    grid_map::GridMapRosConverter::toPointCloud(map_.maps,
-                                                sdf_layer_,
-                                                pointcloud);
 
-    this->point_cloud_.publish(pointcloud);
 
     nav_msgs::Path original_path;
     nav_msgs::Path smooth_path;
     geometry_msgs::PoseStamped pose;
-    original_path.header.frame_id = map_.maps.getFrameId();
+    original_path.header.frame_id = map_.getFrameId();
     original_path.header.stamp = ros::Time::now();
     smooth_path.header = original_path.header;
     pose.header = smooth_path.header;
@@ -183,20 +207,17 @@ void DrivableMap::timerCb() {
     original_path_pub_.publish(original_path);
 
     using namespace path_smoothing;
-    VoronoiDiagram voronoi(map_.maps, 3);
-    DistanceFunction2D
-            dis_function(map_.maps, sdf_layer_, distance_threshold, voronoi);
+    DistanceFunction2D dis_function(map_, sdf_layer_, distance_threshold);
+    showDistanceField(dis_function);
     options_.function = &(dis_function);
 //    options_.cg_solver = SELF_SOLVER;
 
-    /// conjugate-gradient smoothing:
-    options_.smoother_type = NON_DERIVATIVE_METHOD;
-    auto t1 = hmpl::now();
+    options_.smoother_type = CONJUGATE_GRADIENT_METHOD;
+
     std::unique_ptr<PathSmoothing>
-            smoother(PathSmoothing::createSmoother(options_, rough_path));
+        smoother(PathSmoothing::createSmoother(options_, rough_path));
     smoother->smoothPath(options_);
-    auto t2 = hmpl::now();
-    printf("cg smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
+
     std::vector<geometry_msgs::Point> path;
     smoother->getSmoothPath(&path);
     for (const auto &state : path) {
@@ -209,17 +230,14 @@ void DrivableMap::timerCb() {
     /// Gauss Process smoothing:
 #ifdef GPMP2_SMOOTHING_ENABLE
     options_.smoother_type = GAUSS_PROCESS_METHOD;
-    t1 = hmpl::now();
     std::unique_ptr<PathSmoothing>
             smoother2(PathSmoothing::createSmoother(options_, rough_path));
     smoother2->smoothPath(options_);
-    t2 = hmpl::now();
-    printf("gp smooth cost: %f\n", hmpl::getDurationInSecs(t1, t2));
     printf("    gp parameters: obs: %f, dynamic: %f, dt: %f\n",
            options_.gp_obs_sigma,
            options_.gp_vehicle_dynamic_sigma,
            options_.gp_dt);
-    smoother2->getPointPath(&path);
+    smoother2->getSmoothPath(&path);
     nav_msgs::Path smooth2_path;
     smooth2_path.header = smooth_path.header;
     for (const auto &state : path) {

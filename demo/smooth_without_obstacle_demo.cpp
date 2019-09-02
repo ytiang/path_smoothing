@@ -2,13 +2,13 @@
 // Created by yangt on 19-2-18.
 //
 #include "path_smoothing/path_smoothing.hpp"
-#include "opt_utils/csv_reader.hpp"
-#include "opt_utils/opt_utils.hpp"
+#include "csv_reader.hpp"
+
 #include <geometry_msgs/Point.h>
-#include "opt_utils/csv_writer.hpp"
 #include <ros/package.h>
 #include <ros/ros.h>
 #include <memory>
+#include <fstream>
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "path_smooth_demo");
@@ -27,22 +27,21 @@ int main(int argc, char **argv) {
     PathSmoothing::Options options;
     options.cg_solver = SELF_SOLVER;
 //    options.type = CASADI;
-    auto t1 = hmpl::now();
     std::unique_ptr<PathSmoothing>
             smoother(PathSmoothing::createSmoother(options, path));
     smoother->smoothPath(options);
-    auto t2 = hmpl::now();
-    printf("smooth time: %f\n", hmpl::getDurationInSecs(t1, t2));
     smoother->getSmoothPath(&path);
 
 
     // write to file:
-    hmpl::CSVWriter writer(",");
-    writer.newRow() << "x" << "y";
-    for (int i(0); i < path.size(); ++i) {
-        writer.newRow() << path.at(i).x << path.at(i).y;
+    std::ofstream fout(basic_dir+"/demo/smooth_without_obstacle_result.csv");
+    if(fout.is_open()) {
+        fout << "\"x\"" << "," << "\"y\"" << "\n";
+        for (int i(0); i < path.size(); ++i) {
+            fout << path.at(i).x << "," << path.at(i).y << "\n";
+        }
+        fout.close();
     }
-    writer.writeToFile(basic_dir + "/demo/smooth_result.csv");
 
 }
 
